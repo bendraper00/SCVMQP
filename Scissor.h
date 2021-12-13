@@ -1,0 +1,4 @@
+class Scissor{
+    public:
+    private:
+};

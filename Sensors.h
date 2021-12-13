@@ -1,0 +1,4 @@
+class Sensors{
+    public:
+    private:
+};

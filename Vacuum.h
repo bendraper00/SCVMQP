@@ -1,0 +1,4 @@
+class Vacuum{
+    public:
+    private:
+};
