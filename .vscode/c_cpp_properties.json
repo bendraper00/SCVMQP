@@ -22,7 +22,11 @@
                 "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src",
                 "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include",
                 "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include-fixed",
-                "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\avr\\include"
+                "c:\\program files (x86)\\arduino\\hardware\\tools\\avr\\avr\\include",
+                "C:\\Users\\bendr\\Documents\\Arduino\\libraries",
+                "C:/Users/bendr/Documents/Arduino/libraries/button",
+                "C:/Users/bendr/Documents/Arduino/libraries/L3G4200D",
+                "C:/Users/bendr/Documents/Arduino/libraries/L298N/src"
             ],
             "forcedInclude": [
                 "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
