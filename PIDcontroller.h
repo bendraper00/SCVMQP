@@ -1,3 +1,5 @@
+#ifndef PIDCONTROLLER_H_
+#define PIDCONTROLLER_H_
 class PIDController{
     public:
         float kp;
@@ -7,3 +9,4 @@ class PIDController{
         float targ;
     private:
 };
+#endif

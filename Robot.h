@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-
+#ifndef ROBOT_H_
+#define ROBOT_H_
 class Robot{
     public:
         void init();
@@ -17,3 +18,4 @@ class Robot{
         L298N imu;
     private:
 };
+#endif

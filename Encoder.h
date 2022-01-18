@@ -1,3 +1,5 @@
+#ifndef ENCODER_H_
+#define ENCODER_H_
 class Encoder{
     public:
         void init();
@@ -6,3 +8,4 @@ class Encoder{
     private:
         uint16_t counts;
 };
+#endif
