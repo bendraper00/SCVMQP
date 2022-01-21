@@ -24,17 +24,17 @@ boolean DriveModule::setWheelAngle(uint8_t target){}
 
 boolean DriveModule::driveDist(float target){
   static boolean dir = true;
-  static int16_t error;
-  static float kp = 1;
+  static uint16_t error;
+  static const float kp = 1;
   static State state = WAITING;
   static uint16_t startTime;
-  boolean status = false;;
-  static int effortSpeed = 0;
+  boolean status = false;
+  static uint16_t effortSpeed = 0;
   this->enc->updateCounts();
-  uint16_t currCounts = this->enc->getCounts();
+  int16_t currCounts = this->enc->getCounts();
 
   //Serial.println("STATE: " + String(state) + "\t\tEffort: " + String(effortSpeed) + "\t\tDirection: " + String(dir));
-  Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts));
+  Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts) + "\t\tERROR: " + String(error));
 
   //For initial call of this function, set the target counts
   if(this->moving == false){
@@ -50,9 +50,10 @@ boolean DriveModule::driveDist(float target){
       error = abs(this->targetCounts - currCounts);
       //if error is negative, direction is backwards
       if(this->targetCounts - currCounts < 0){dir = false;}
+      else{ dir = true;}
       //Effort speed (actually 0-255) is calculated
       effortSpeed = int(kp * error);
-      if(effortSpeed > 255){effortSpeed = 255;}
+      if(effortSpeed > 75){effortSpeed = 75;}
       driveSpeed(effortSpeed, dir);
       
       //If current counts is within 5 counts of goal, change to waiting state

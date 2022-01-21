@@ -19,7 +19,7 @@ class DriveModule{
       //rotate wheels
       //turn robot (can only occur when wheel axis colinear)
       Encoder* enc;
-      uint16_t targetCounts;
+      int16_t targetCounts;
     
     private:
       L298N* motor;
