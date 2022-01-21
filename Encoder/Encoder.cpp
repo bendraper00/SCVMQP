@@ -20,13 +20,20 @@ uint16_t Encoder::getCounts(){
 void Encoder::updateCounts(){
     this->counts = statCounts;
 }
+void Encoder::updatePrevCounts(){
+    this->prevCounts = this->counts;
+}
 float Encoder::calcDist(uint16_t start, uint16_t end){
     //800 Counts per revolution
     //Wheel OD is 40mm
     // 1 count = 0.15708mm
     return (end-start)*0.15708;
 }
-static void Encoder::encoderISR(){
+uint16_t Encoder::distToCounts(float dist){
+    uint16_t counts = dist/0.15708; //possibly problematic idk if this will round to nearest count
+    return counts;
+}
+void Encoder::encoderISR(){
     //turn off interrupts... I think
     if(digitalRead(statPinA) && !digitalRead(statPinB)){
         statCounts++;

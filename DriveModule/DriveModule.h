@@ -2,20 +2,27 @@
 #define DRIVEMODULE_H_
 #include <L298N.h>
 #include <stdint.h>
-#include "PIDcontroller.h"
+#include "..\PIDController\PIDcontroller.h"
+#include "..\Encoder\Encoder.h"
+
 class DriveModule{
     public:
-      DriveModule(void);
+      DriveModule(const unsigned int EN,
+                  const unsigned int IN1,
+                  const unsigned int IN2,
+                  uint8_t chA,
+                  uint8_t chB);
       void init();
       void driveSpeed(uint8_t target, boolean dir);
       boolean setWheelAngle(uint8_t target);
-      boolean driveDist(float target, float speed);
+      boolean driveDist(float target);
       //rotate wheels
       //turn robot (can only occur when wheel axis colinear)
     
     private:
-      L298N motor;
-      PIDController pid;
-    
+      L298N* motor;
+      Encoder* enc;
+      boolean moving = false;
+      uint16_t targetCounts;
 };
 #endif
