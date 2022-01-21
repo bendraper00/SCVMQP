@@ -26,6 +26,7 @@ boolean DriveModule::driveDist(float target){
   static boolean dir = true;
   static int16_t error;
   static float kp = 1;
+  
   if(this->moving == false){
     this->targetCounts = this->enc->getCounts() + this->enc->distToCounts(target);
     this->moving = true; 
