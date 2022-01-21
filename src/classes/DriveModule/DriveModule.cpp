@@ -23,26 +23,56 @@ void DriveModule::driveSpeed(uint8_t target, boolean dir){
 boolean DriveModule::setWheelAngle(uint8_t target){}
 
 boolean DriveModule::driveDist(float target){
-  ///PROBABLY NEED TO IMPLEMENT EVENT TIMER HERE
-  
   static boolean dir = true;
   static int16_t error;
-  static float kp = 200;
-  
+  static float kp = 1;
+  static State state = WAITING;
+  static uint16_t startTime;
+  boolean status = false;;
+  static int effortSpeed = 0;
+  this->enc->updateCounts();
+  uint16_t currCounts = this->enc->getCounts();
+
+  //Serial.println("STATE: " + String(state) + "\t\tEffort: " + String(effortSpeed) + "\t\tDirection: " + String(dir));
+  Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts));
+
+  //For initial call of this function, set the target counts
   if(this->moving == false){
-    this->enc->updateCounts();
-    this->targetCounts = this->enc->getCounts() + this->enc->distToCounts(target);
+    this->targetCounts = currCounts + this->enc->distToCounts(target);
+    state = DRIVING;
     this->moving = true; 
   }
 
-  while(abs(this->targetCounts - this->enc->getCounts()) >= 5){
-    this->enc->updateCounts();
-    error = this->targetCounts - this->enc->getCounts();
-    if(this->targetCounts - this->enc->getCounts() < 0){dir = false;}
-    float effortSpeed = kp * error;
-    driveSpeed(effortSpeed, dir);
-    //Serial.println(this->enc->getCounts());
-  }
+  //DRIVE DISTANCE STATE MACHINE
+  switch(state){
+    case DRIVING: //Drive toward target until target is met, then wait. If time elapsed is met without leaving threashold, exit and return true and set moving to false.
+      //Calculate absolute error
+      error = abs(this->targetCounts - currCounts);
+      //if error is negative, direction is backwards
+      if(this->targetCounts - currCounts < 0){dir = false;}
+      //Effort speed (actually 0-255) is calculated
+      effortSpeed = int(kp * error);
+      if(effortSpeed > 255){effortSpeed = 255;}
+      driveSpeed(effortSpeed, dir);
+      
+      //If current counts is within 5 counts of goal, change to waiting state
+      if(abs(this->targetCounts - currCounts) < 10){
+        startTime = millis();
+        state = WAITING;
+      }
+      break;
 
-  return true;
+    case WAITING:
+      //If 1 second has elapsed since definition of startTime, return true
+      this->motor->stop(); 
+      if(millis() - startTime >= 1000){
+        status = true;
+      }
+      //If one second has not passed and the counts left target range, return to DRIVING
+      else if(abs(this->targetCounts - currCounts) >= 10){
+        state = DRIVING;
+      }
+      break;
+  }
+  return status;
 }

@@ -19,10 +19,12 @@ class DriveModule{
       //rotate wheels
       //turn robot (can only occur when wheel axis colinear)
       Encoder* enc;
+      uint16_t targetCounts;
     
     private:
       L298N* motor;
       boolean moving = false;
-      uint16_t targetCounts;
+      enum State{DRIVING, WAITING};
+      
 };
 #endif

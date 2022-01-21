@@ -13,6 +13,7 @@ DriveModule *mod;
 void setup()
 {
   Serial.begin(9600);
+  while(!Serial){}
   mod = new DriveModule(EN, IN1, IN2, chA, chB);
   mod->init();
 }
@@ -20,5 +21,4 @@ void setup()
 void loop()
 {
   mod->driveDist(40*3.1415);
-  Serial.println(mod->enc->getCounts());
 }
