@@ -1,13 +1,15 @@
 #include "DriveModule.h"
 #include <Arduino.h>
 
-DriveModule::DriveModule(const unsigned int EN, const unsigned int IN1, const unsigned int IN2, uint8_t chA, uint8_t chB){
+DriveModule::DriveModule(const unsigned int EN, const unsigned int IN1, const unsigned int IN2, uint8_t chA, uint8_t chB, uint8_t servoPin){
   this->motor = new L298N(EN, IN1, IN2);
   this->enc = new Encoder(chA, chB);
+  this->servoPin = servoPin;
 }
 
 void DriveModule::init(){
   this->enc->init();
+  this->servo.attach(this->servoPin);
 }
 
 void DriveModule::driveSpeed(uint8_t target, boolean dir){
@@ -20,7 +22,11 @@ void DriveModule::driveSpeed(uint8_t target, boolean dir){
     }
 }
 
-boolean DriveModule::setWheelAngle(uint8_t target){}
+boolean DriveModule::setWheelAngle(int8_t target){
+  this->servo.write(int((1.388888889*double(target))+10.0));
+  //10 is the zero point
+  //135 is 90
+}
 
 boolean DriveModule::driveDist(float target){
   static boolean dir = true;
@@ -53,7 +59,7 @@ boolean DriveModule::driveDist(float target){
       else{ dir = true;}
       //Effort speed (actually 0-255) is calculated
       effortSpeed = int(kp * error);
-      if(effortSpeed > 75){effortSpeed = 75;}
+      if(effortSpeed > 75){effortSpeed = 75;} //75 can be replaced with desired max speed
       driveSpeed(effortSpeed, dir);
       
       //If current counts is within 5 counts of goal, change to waiting state
