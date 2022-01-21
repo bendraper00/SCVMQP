@@ -18,10 +18,10 @@ class DriveModule{
       boolean driveDist(float target);
       //rotate wheels
       //turn robot (can only occur when wheel axis colinear)
+      Encoder* enc;
     
     private:
       L298N* motor;
-      Encoder* enc;
       boolean moving = false;
       uint16_t targetCounts;
 };

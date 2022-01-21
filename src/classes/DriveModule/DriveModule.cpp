@@ -23,11 +23,14 @@ void DriveModule::driveSpeed(uint8_t target, boolean dir){
 boolean DriveModule::setWheelAngle(uint8_t target){}
 
 boolean DriveModule::driveDist(float target){
+  ///PROBABLY NEED TO IMPLEMENT EVENT TIMER HERE
+  
   static boolean dir = true;
   static int16_t error;
-  static float kp = 1;
+  static float kp = 200;
   
   if(this->moving == false){
+    this->enc->updateCounts();
     this->targetCounts = this->enc->getCounts() + this->enc->distToCounts(target);
     this->moving = true; 
   }
@@ -38,6 +41,7 @@ boolean DriveModule::driveDist(float target){
     if(this->targetCounts - this->enc->getCounts() < 0){dir = false;}
     float effortSpeed = kp * error;
     driveSpeed(effortSpeed, dir);
+    //Serial.println(this->enc->getCounts());
   }
 
   return true;
