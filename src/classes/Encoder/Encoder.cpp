@@ -1,7 +1,8 @@
 #include "Encoder.h"
 byte statPinA;
 byte statPinB;
-uint16_t statCounts = 0;
+volatile uint32_t statCounts = 0;
+volatile uint32_t statCountsBack = 0; //Will eventually need this
 
 Encoder::Encoder(uint8_t pinA,uint8_t pinB){
     this->pinA = pinA;

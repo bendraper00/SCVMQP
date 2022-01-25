@@ -15,7 +15,7 @@ class Encoder{
     private:
         uint8_t pinA;
         uint8_t pinB;
-        int16_t counts;
-        int16_t prevCounts;
+        int32_t counts;
+        int32_t prevCounts;
 };
 #endif

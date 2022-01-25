@@ -12,13 +12,16 @@ void DriveModule::init(){
   this->servo.attach(this->servoPin);
 }
 
-void DriveModule::driveSpeed(uint8_t target, boolean dir){
-    this->motor->setSpeed(target);
-    if(dir == true){
+void DriveModule::driveSpeed(uint8_t target){
+    this->motor->setSpeed(abs(target));
+    if(target > 0){
       this->motor->forward();
     }
-    else{
+    else if(target < 0){
       this->motor->backward();
+    }
+    else{
+      this->motor->stop();
     }
 }
 
@@ -29,9 +32,9 @@ boolean DriveModule::setWheelAngle(int8_t target){
 }
 
 boolean DriveModule::driveDist(float target){
-  static boolean dir = true;
+  static int dir = 1;
   static uint16_t error;
-  static const float kp = 1;
+  static const float kp = 2;
   static State state = WAITING;
   static uint16_t startTime;
   boolean status = false;
@@ -40,7 +43,7 @@ boolean DriveModule::driveDist(float target){
   int16_t currCounts = this->enc->getCounts();
 
   //Serial.println("STATE: " + String(state) + "\t\tEffort: " + String(effortSpeed) + "\t\tDirection: " + String(dir));
-  Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts) + "\t\tERROR: " + String(error));
+  //Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts) + "\t\tERROR: " + String(error));
 
   //For initial call of this function, set the target counts
   if(this->moving == false){
@@ -55,12 +58,12 @@ boolean DriveModule::driveDist(float target){
       //Calculate absolute error
       error = abs(this->targetCounts - currCounts);
       //if error is negative, direction is backwards
-      if(this->targetCounts - currCounts < 0){dir = false;}
+      if(this->targetCounts - currCounts < 0){dir = -1;}
       else{ dir = true;}
       //Effort speed (actually 0-255) is calculated
       effortSpeed = int(kp * error);
       if(effortSpeed > 75){effortSpeed = 75;} //75 can be replaced with desired max speed
-      driveSpeed(effortSpeed, dir);
+      driveSpeed(effortSpeed * dir);
       
       //If current counts is within 5 counts of goal, change to waiting state
       if(abs(this->targetCounts - currCounts) < 10){
@@ -73,6 +76,7 @@ boolean DriveModule::driveDist(float target){
       //If 1 second has elapsed since definition of startTime, return true
       this->motor->stop(); 
       if(millis() - startTime >= 1000){
+        this->moving = false;
         status = true;
       }
       //If one second has not passed and the counts left target range, return to DRIVING

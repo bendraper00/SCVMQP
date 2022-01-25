@@ -15,18 +15,18 @@ class DriveModule{
                   uint8_t chB,
                   uint8_t servoPin);
       void init();
-      void driveSpeed(uint8_t target, boolean dir);
+      void driveSpeed(uint8_t target);
       boolean setWheelAngle(int8_t target);
       boolean driveDist(float target);
       //turn robot or Skid Steer (can only occur when wheel axis colinear)
-    
+      boolean moving = false;
+      Encoder* enc;
+
     private:
       L298N* motor;
       uint8_t servoPin;
       Servo servo;
-      boolean moving = false;
-      Encoder* enc;
-      int16_t targetCounts;
+      int32_t targetCounts;
       enum State{DRIVING, WAITING};
       
 };
