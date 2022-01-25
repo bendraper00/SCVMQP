@@ -6,9 +6,9 @@
 
 uint8_t chA = 2;
 uint8_t chB = 3;
-const unsigned int EN = 4;
-const unsigned int IN1 = 5;
-const unsigned int IN2 = 6;
+const unsigned int EN = 10;
+const unsigned int IN1 = 11;
+const unsigned int IN2 = 12;
 uint8_t servoPin = 9;
 
 int state = 1;
@@ -25,16 +25,16 @@ void setup()
   
   noInterrupts();
   //USE TIMER 4 (16 bit)
-  //TCCR4B = 0x54
   TCCR4A = 0x00;
   TCCR4B = 0x0C; //sets the prescaler (256) and CTC mode
-  TCCR4A = 0x00;
-  OCR4A = 12499;
+  TCCR4C = 0x00;
+  OCR4A = 6249;
+  //OCR4A = 31249;
   TIMSK4 = 0x01; //enable overflow interrupt
   interrupts();
 
-  mod = new DriveModule(EN, IN1, IN2, chA, chB, servoPin);
-  mod->init();
+  //mod = new DriveModule(EN, IN1, IN2, chA, chB, servoPin);
+  //mod->init();
 }
 
 void loop()
@@ -61,9 +61,8 @@ void loop()
   //     mod->setWheelAngle(0);
   //     state = 1;
   //     break;
-    
   // }
-  mod->driveSpeed(255);
+  //mod->driveSpeed(255);
   CalcPID();
 }
 
@@ -84,6 +83,6 @@ void CalcPID(){
     prev = counts;
     interrupts();
 
-   Serial.println(micros()); 
+   Serial.println(millis()); 
   }
 }
