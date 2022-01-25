@@ -11,7 +11,7 @@ const unsigned int IN1 = 5;
 const unsigned int IN2 = 6;
 uint8_t servoPin = 9;
 
-int state = 6249;
+int state = 1;
 volatile uint8_t readyToPID = 0;
 volatile int32_t counts = 0;
 volatile int32_t startCounts = 0;
@@ -25,8 +25,11 @@ void setup()
   
   noInterrupts();
   //USE TIMER 4 (16 bit)
-  TCCR4B = 0x0C; //sets the prescaler and CTC mode
-  OCR4C = 12499;
+  //TCCR4B = 0x54
+  TCCR4A = 0x00;
+  TCCR4B = 0x0C; //sets the prescaler (256) and CTC mode
+  TCCR4A = 0x00;
+  OCR4A = 12499;
   TIMSK4 = 0x01; //enable overflow interrupt
   interrupts();
 
@@ -81,6 +84,6 @@ void CalcPID(){
     prev = counts;
     interrupts();
 
-   Serial.println(speed); 
+   Serial.println(micros()); 
   }
 }
