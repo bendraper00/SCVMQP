@@ -3,76 +3,62 @@
 #include "src\classes\DriveModule\DriveModule.h"
 #include <TimerInterrupt.h>
 
-
+//PIN DEFINITIONS
 uint8_t chA = 2;
-uint8_t chB = 3;
+uint8_t chB = 51;
 const unsigned int EN = 10;
-const unsigned int IN1 = 11;
-const unsigned int IN2 = 12;
+const unsigned int IN1 = 53;
+const unsigned int IN2 = 52;
 uint8_t servoPin = 9;
 
+//Objects
+DriveModule *mod;
+
+//Temp Variables for testing
 int state = 1;
 volatile uint8_t readyToPID = 0;
 volatile int32_t counts = 0;
 volatile int32_t startCounts = 0;
-
-DriveModule *mod;
-
 
 void setup()
 {
   Serial.begin(9600);
   
   noInterrupts();
-  //USE TIMER 4 (16 bit)
-  TCCR4A = 0x00;
-  TCCR4B = 0x0C; //sets the prescaler (256) and CTC mode
-  TCCR4C = 0x00;
-  OCR4A = 6249;
-  //OCR4A = 31249;
-  TIMSK4 = 0x01; //enable overflow interrupt
+  //USE TIMER 3 (16 bit) (Had to comment out block in Servo.h, this timer also controls PWM for pins 2,3, and 5)
+  TCCR3A = 0;
+  TCCR3B &= ~(1<<WGM33); //CTC Mode
+  TCCR3B |= (1<<WGM32); //CTC Mode
+  TCCR3B |= (1<<CS32); //Prescalar
+  TCCR3B &= ~(1<<CS31); //Prescalar
+  TCCR3B &= ~(1<<CS30); //Prescalar
+  TCNT3 = 0;
+  OCR3A = 6249;
+  TIMSK3 = (1<<OCIE3A);
   interrupts();
+  sei();
 
-  //mod = new DriveModule(EN, IN1, IN2, chA, chB, servoPin);
-  //mod->init();
+  mod = new DriveModule(EN, IN1, IN2, chA, chB, servoPin);
+  mod->init();
+  mod->driveSpeed(255);
 }
+
 
 void loop()
 {
-  // switch(state){
-  //   Serial.println(state);
-  //   case 1:
-  //     mod->driveDist(40*3.1415);
-  //     if(mod->moving == false){
-  //       state = 2;
-  //     }
-  //     break;
-  //   case 2:
-  //     mod->setWheelAngle(90);
-  //     state = 3;
-  //     break;
-  //   case 3:
-  //     mod->driveDist(40*3.1415);
-  //     if(mod->moving == false){
-  //       state = 4;
-  //     }
-  //     break;
-  //   case 4:
-  //     mod->setWheelAngle(0);
-  //     state = 1;
-  //     break;
-  // }
-  //mod->driveSpeed(255);
   CalcPID();
 }
 
-ISR(TIMER4_OVF_vect){
+ISR(TIMER3_COMPA_vect)
+{
   mod->enc->updateCounts();
   counts = mod->enc->getCounts();
   readyToPID = 1;
 }
 
-void CalcPID(){
+void CalcPID()
+{
+
   if(readyToPID){
     readyToPID = 0;
     static int16_t prev = 0;
@@ -83,6 +69,7 @@ void CalcPID(){
     prev = counts;
     interrupts();
 
-   Serial.println(millis()); 
+   Serial.println(speed);
   }
+
 }

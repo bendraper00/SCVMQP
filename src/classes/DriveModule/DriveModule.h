@@ -16,6 +16,7 @@ class DriveModule{
                   uint8_t servoPin);
       void init();
       void driveSpeed(uint8_t target);
+      void pidSpeed(uint8_t target);
       boolean setWheelAngle(int8_t target);
       boolean driveDist(float target);
       //turn robot or Skid Steer (can only occur when wheel axis colinear)

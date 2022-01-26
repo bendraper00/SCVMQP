@@ -1,6 +1,9 @@
 #include "DriveModule.h"
 #include <Arduino.h>
 
+volatile uint8_t readyToPID = 0;
+Encoder* encP;
+
 DriveModule::DriveModule(const unsigned int EN, const unsigned int IN1, const unsigned int IN2, uint8_t chA, uint8_t chB, uint8_t servoPin){
   this->motor = new L298N(EN, IN1, IN2);
   this->enc = new Encoder(chA, chB);
@@ -9,7 +12,21 @@ DriveModule::DriveModule(const unsigned int EN, const unsigned int IN1, const un
 
 void DriveModule::init(){
   this->enc->init();
+  encP = this->enc; //For ISR
   this->servo.attach(this->servoPin);
+  noInterrupts();
+  //USE TIMER 3 (16 bit) (Had to comment out block in Servo.h, this timer also controls PWM for pins 2,3, and 5)
+  TCCR3A = 0;
+  TCCR3B &= ~(1<<WGM33); //CTC Mode
+  TCCR3B |= (1<<WGM32); //CTC Mode
+  TCCR3B |= (1<<CS32); //Prescalar
+  TCCR3B &= ~(1<<CS31); //Prescalar
+  TCCR3B &= ~(1<<CS30); //Prescalar
+  TCNT3 = 0;
+  OCR3A = 6249;
+  TIMSK3 = (1<<OCIE3A);
+  interrupts();
+  sei();
 }
 
 void DriveModule::driveSpeed(uint8_t target){
@@ -23,6 +40,21 @@ void DriveModule::driveSpeed(uint8_t target){
     else{
       this->motor->stop();
     }
+}
+
+void DriveModule::pidSpeed(uint8_t target){
+  if(readyToPID){
+    readyToPID = 0;
+    static int16_t prev = 0;
+    static int16_t sum = 0;
+
+    noInterrupts();
+    int16_t speed = counts - prev;
+    prev = counts;
+    interrupts();
+
+   Serial.println(speed);
+  }
 }
 
 boolean DriveModule::setWheelAngle(int8_t target){
@@ -86,4 +118,11 @@ boolean DriveModule::driveDist(float target){
       break;
   }
   return status;
+}
+
+ISR(TIMER3_COMPA_vect)
+{
+  encP->updateCounts();
+  counts = encP->getCounts();
+  readyToPID = 1;
 }
