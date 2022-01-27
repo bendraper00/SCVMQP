@@ -18,8 +18,8 @@ int PIDController::calcPIDSpeed(uint8_t target, int16_t curr, uint16_t cap){
   errorSum += error;
 
   int output = kp*error + ki*errorSum;
-  if(output > cap){effort = cap;}
-  if(output < -1*cap){effort = -1*cap;}
+  if(output > cap){output = cap;}
+  if(output < -1*cap){output = -1*cap;}
 
-  return output
+  return output;
 }

@@ -11,7 +11,7 @@ NOTES:
 //Pins Assignments
 static const uint8_t FRONT_ENCODER_A = 2;
 static const uint8_t FRONT_ENCODER_B = 51;
-static const uint8_t FRONT_DRIVE_EN = 10;
+static const uint8_t FRONT_DRIVE_EN = 11;
 static const uint8_t FRONT_DRIVE_IN1 = 53;
 static const uint8_t FRONT_DRIVE_IN2 = 52;
 static const uint8_t FRONT_DRIVE_SERVO = 9;

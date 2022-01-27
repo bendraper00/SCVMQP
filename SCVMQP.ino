@@ -18,5 +18,5 @@ void setup()
 
 void loop()
 {
-bot.frontDrive->setWheelAngle(0);
+  bot.stairFollow(100, 75);
 }

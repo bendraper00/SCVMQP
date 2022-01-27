@@ -22,11 +22,11 @@ class DriveModule{
       //turn robot or Skid Steer (can only occur when wheel axis colinear)
       boolean moving = false;
       Encoder* enc;
+      Servo servo;
 
     private:
       L298N* motor;
       uint8_t servoPin;
-      Servo servo;
       int32_t targetCounts;
       enum State{DRIVING, WAITING};
       PIDController* speedPID;
