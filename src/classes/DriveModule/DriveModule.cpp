@@ -9,6 +9,7 @@ DriveModule::DriveModule(const uint8_t EN, const uint8_t IN1, const uint8_t IN2,
   this->motor = new L298N(EN, IN1, IN2);
   this->enc = new Encoder(chA, chB);
   this->servoPin = servoPin;
+  this->speedPID = new PIDController(3.0, 0.5, 0);
 }
 
 void DriveModule::init(){
@@ -46,25 +47,9 @@ void DriveModule::driveSpeed(uint8_t target){
 void DriveModule::pidSpeed(uint8_t target){
   if(readyToPID){
     readyToPID = 0;
-    static int16_t prev = 0;
-    static int16_t sum = 0;
-    static const float kp = 3;
-    static const float ki = .5;
-
-    noInterrupts();
-    int16_t speed = speedCounts - prev;
-    prev = speedCounts;
-    interrupts();
-
-    int16_t error = target - speed;
-    sum += error;
-
-    int effort = kp*error + ki*sum;
-    if(effort > 255){effort = 255;}
-    if(effort < -255){effort = -255;}
-
+    int effort = this->speedPID->calcPIDSpeed(target, speedCounts);
     this->driveSpeed(effort);
-    Serial.println(speed);
+    Serial.println(effort);
   }
 }
 

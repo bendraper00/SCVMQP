@@ -29,6 +29,7 @@ class DriveModule{
       Servo servo;
       int32_t targetCounts;
       enum State{DRIVING, WAITING};
+      PIDController* speedPID;
       
 };
 #endif
