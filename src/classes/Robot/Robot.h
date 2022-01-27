@@ -1,21 +1,18 @@
-#include "Scissor.h"
-#include "DriveModule.h""
-#include "Vacuum.h"
-#include <Arduino.h>
-#include <Wire.h>
-
 #ifndef ROBOT_H_
 #define ROBOT_H_
+#include "..\DriveModule\DriveModule.h"
+#include "..\Sensors\Sensors.h"
+#include "..\..\..\config.h"
+
 class Robot{
     public:
-        void init();
         Robot();
-        Scissor frontScissor;
-        Scissor rearScissor;
-        DriveModule frontDrive;
-        DriveModule rearDrive;
-        Vacuum vac;
-        L298N imu;
+        void init();
+        DriveModule* frontDrive;
+        Sensors tofSensor;
+
+        void stairFollow(uint8_t speed, uint8_t dist);
+        
     private:
 };
 #endif

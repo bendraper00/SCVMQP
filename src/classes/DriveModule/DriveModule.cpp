@@ -5,7 +5,7 @@ volatile uint8_t readyToPID = 0;
 Encoder* encP;
 volatile int16_t speedCounts = 0;
 
-DriveModule::DriveModule(const unsigned int EN, const unsigned int IN1, const unsigned int IN2, uint8_t chA, uint8_t chB, uint8_t servoPin){
+DriveModule::DriveModule(const uint8_t EN, const uint8_t IN1, const uint8_t IN2, const uint8_t chA, const uint8_t chB, const uint8_t servoPin){
   this->motor = new L298N(EN, IN1, IN2);
   this->enc = new Encoder(chA, chB);
   this->servoPin = servoPin;

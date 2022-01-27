@@ -8,12 +8,12 @@
 
 class DriveModule{
     public:
-      DriveModule(const unsigned int EN,
-                  const unsigned int IN1,
-                  const unsigned int IN2,
-                  uint8_t chA,
-                  uint8_t chB,
-                  uint8_t servoPin);
+      DriveModule(const uint8_t EN,
+                  const uint8_t IN1,
+                  const uint8_t IN2,
+                  const uint8_t chA,
+                  const uint8_t chB,
+                  const uint8_t servoPin);
       void init();
       void driveSpeed(uint8_t target);
       void pidSpeed(uint8_t target);

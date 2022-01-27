@@ -20,3 +20,7 @@ void Sensors::readRange(){
     if(sensorR.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
     Serial.println();
 }
+
+uint16_t Sensors::getRange(){
+    return sensorR.readRangeContinuousMillimeters();
+}

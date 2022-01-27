@@ -9,6 +9,8 @@ class Sensors{
         Sensors();
         void init();
         void readRange();
+        uint16_t getRange();
+
     private:
     VL6180X sensorR;
 };
