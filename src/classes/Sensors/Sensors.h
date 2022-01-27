@@ -1,12 +1,15 @@
+#ifndef SENSORS_H_
+#define SENSORS_H_
 #include <VL6180X.h> //Time of Flight sensor
 #include <L3G4200D.h>
 #include <button.h>
-#ifndef SENSORS_H_
-#define SENSORS_H_
+#include <Wire.h>
 class Sensors{
     public:
-        void init();
         Sensors();
+        void init();
+        void readRange();
     private:
+    VL6180X sensorR;
 };
 #endif

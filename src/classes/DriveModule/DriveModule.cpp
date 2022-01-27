@@ -3,6 +3,7 @@
 
 volatile uint8_t readyToPID = 0;
 Encoder* encP;
+volatile int16_t speedCounts = 0;
 
 DriveModule::DriveModule(const unsigned int EN, const unsigned int IN1, const unsigned int IN2, uint8_t chA, uint8_t chB, uint8_t servoPin){
   this->motor = new L298N(EN, IN1, IN2);
@@ -47,13 +48,23 @@ void DriveModule::pidSpeed(uint8_t target){
     readyToPID = 0;
     static int16_t prev = 0;
     static int16_t sum = 0;
+    static const float kp = 3;
+    static const float ki = .5;
 
     noInterrupts();
-    int16_t speed = counts - prev;
-    prev = counts;
+    int16_t speed = speedCounts - prev;
+    prev = speedCounts;
     interrupts();
 
-   Serial.println(speed);
+    int16_t error = target - speed;
+    sum += error;
+
+    int effort = kp*error + ki*sum;
+    if(effort > 255){effort = 255;}
+    if(effort < -255){effort = -255;}
+
+    this->driveSpeed(effort);
+    Serial.println(speed);
   }
 }
 
@@ -123,6 +134,6 @@ boolean DriveModule::driveDist(float target){
 ISR(TIMER3_COMPA_vect)
 {
   encP->updateCounts();
-  counts = encP->getCounts();
+  speedCounts = encP->getCounts();
   readyToPID = 1;
 }
