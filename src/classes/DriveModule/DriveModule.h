@@ -5,6 +5,7 @@
 #include "..\PIDController\PIDcontroller.h"
 #include "..\Encoder\Encoder.h"
 #include <Servo.h>
+#include "../../../config.h"
 
 class DriveModule{
     public:
@@ -30,6 +31,5 @@ class DriveModule{
       int32_t targetCounts;
       enum State{DRIVING, WAITING};
       PIDController* speedPID;
-      
 };
 #endif

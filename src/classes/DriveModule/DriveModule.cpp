@@ -4,6 +4,8 @@
 volatile uint8_t readyToPID = 0;
 Encoder* encP;
 volatile int16_t speedCounts = 0;
+boolean offGround = false;
+uint32_t timeOffGround = 0;
 
 DriveModule::DriveModule(const uint8_t EN, const uint8_t IN1, const uint8_t IN2, const uint8_t chA, const uint8_t chB, const uint8_t servoPin){
   this->motor = new L298N(EN, IN1, IN2);
@@ -29,6 +31,8 @@ void DriveModule::init(){
   TIMSK3 = (1<<OCIE3A);
   interrupts();
   sei();
+
+  attachInterrupt(FRONT_DRIVE_BUTTON, ButtonISR, FALLING);
 }
 
 void DriveModule::driveSpeed(uint8_t target){
@@ -45,7 +49,10 @@ void DriveModule::driveSpeed(uint8_t target){
 }
 
 void DriveModule::pidSpeed(uint8_t target){
-  if(readyToPID){
+  if(offGround == true && millis() - timeOffGround < 1000){
+    this->driveSpeed(0);
+  }
+  else if(readyToPID){
     readyToPID = 0;
     int effort = this->speedPID->calcPIDSpeed(target, speedCounts, 255);
     this->driveSpeed(effort);
@@ -121,4 +128,9 @@ ISR(TIMER3_COMPA_vect)
   encP->updateCounts();
   speedCounts = encP->getCounts();
   readyToPID = 1;
+}
+
+ButtonISR(){
+  offGround = true;
+  timeOffGround = millis();
 }

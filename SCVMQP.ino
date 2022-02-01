@@ -18,5 +18,5 @@ void setup()
 
 void loop()
 {
-  bot.stairFollow(100, 75);
+  Serial.println(bot.tofSensor.readRange());
 }

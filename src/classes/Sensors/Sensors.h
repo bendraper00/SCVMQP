@@ -4,6 +4,8 @@
 #include <L3G4200D.h>
 #include <button.h>
 #include <Wire.h>
+#include "../../../config.h"
+
 class Sensors{
     public:
         Sensors();
@@ -13,5 +15,6 @@ class Sensors{
 
     private:
     VL6180X sensorR;
+    
 };
 #endif
