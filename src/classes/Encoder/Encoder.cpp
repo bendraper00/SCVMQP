@@ -28,10 +28,10 @@ float Encoder::calcDist(int16_t start, int16_t end){
     //800 Counts per revolution
     //Wheel OD is 40mm
     // 1 count = 0.15708mm
-    return (end-start)*0.15708;
+    return (end-start)*ENCODER_COUNTS_TO_MM;
 }
 int16_t Encoder::distToCounts(float dist){
-    uint16_t counts = dist/0.15708; //possibly problematic idk if this will round to nearest count
+    uint16_t counts = dist/ENCODER_COUNTS_TO_MM; //possibly problematic idk if this will round to nearest count
     return counts;
 }
 void Encoder::encoderISR(){

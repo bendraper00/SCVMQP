@@ -11,7 +11,7 @@ DriveModule::DriveModule(const uint8_t EN, const uint8_t IN1, const uint8_t IN2,
   this->motor = new L298N(EN, IN1, IN2);
   this->enc = new Encoder(chA, chB);
   this->servoPin = servoPin;
-  this->speedPID = new PIDController(3.0, 0.5, 0);
+  this->speedPID = new PIDController(PID_SPEED_KP, PID_SPEED_KI, PID_SPEED_KD);
 }
 
 void DriveModule::init(){
@@ -49,27 +49,27 @@ void DriveModule::driveSpeed(uint8_t target){
 }
 
 void DriveModule::pidSpeed(uint8_t target){
-  if(offGround == true && millis() - timeOffGround < 1000){
+  if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
     this->driveSpeed(0);
   }
   else if(readyToPID){
     readyToPID = 0;
-    int effort = this->speedPID->calcPIDSpeed(target, speedCounts, 255);
+    int effort = this->speedPID->calcPIDSpeed(target, speedCounts, MAX_DRIVE_SPEED);
     this->driveSpeed(effort);
     Serial.println(effort);
   }
 }
 
 boolean DriveModule::setWheelAngle(int8_t target){
+  //THIS MAPS SERVO PWM TO ACTUAL DRIVE MODULE POSITION
   this->servo.write((int)(1.41*(double)target)+7.0);
-  //10 is the zero point
-  //135 is 90
 }
 
 boolean DriveModule::driveDist(float target){
+  //NEED TO IMPLEMENT PID CLASS INSTEAD IN THIS FUNCTION STILL
   static int dir = 1;
   static uint16_t error;
-  static const float kp = 2;
+  static const float kp = PID_DIST_KP;
   static State state = WAITING;
   static uint16_t startTime;
   boolean status = false;
@@ -97,11 +97,11 @@ boolean DriveModule::driveDist(float target){
       else{ dir = true;}
       //Effort speed (actually 0-255) is calculated
       effortSpeed = int(kp * error);
-      if(effortSpeed > 75){effortSpeed = 75;} //75 can be replaced with desired max speed
+      if(effortSpeed > CONTROLLED_DRIVE_SPEED){effortSpeed = CONTROLLED_DRIVE_SPEED;} //75 can be replaced with desired max speed
       driveSpeed(effortSpeed * dir);
       
       //If current counts is within 5 counts of goal, change to waiting state
-      if(abs(this->targetCounts - currCounts) < 10){
+      if(abs(this->targetCounts - currCounts) < DRIVE_DIST_TOLERANCE_ENC){
         startTime = millis();
         state = WAITING;
       }
@@ -115,7 +115,7 @@ boolean DriveModule::driveDist(float target){
         status = true;
       }
       //If one second has not passed and the counts left target range, return to DRIVING
-      else if(abs(this->targetCounts - currCounts) >= 10){
+      else if(abs(this->targetCounts - currCounts) >= DRIVE_DIST_TOLERANCE_ENC){
         state = DRIVING;
       }
       break;

@@ -2,6 +2,7 @@
 #define ENCODER_H_
 #include <stdint.h>
 #include <Arduino.h>
+#include "../../../config.h"
 class Encoder{
     public:
         Encoder(uint8_t pinA, uint8_t pinB);

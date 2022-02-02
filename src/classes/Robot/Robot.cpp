@@ -18,16 +18,16 @@ void Robot::stairFollow(uint8_t speed, uint8_t dist){
 
     if(speed > 0){
         int error = dist - tofSensor.getRange();
-        int angle = 90 + error;
-        if(angle > 120){angle = 120;}
-        if(angle < 60){angle = 60;}
+        int angle = SERVO_POS_3 + error;
+        if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
+        if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
         this->frontDrive->setWheelAngle(angle);
     }
     if(speed < 0){
         int error = tofSensor.getRange() - dist; //negative error
-        int angle = 90 + error;
-        if(angle > 120){angle = 120;}
-        if(angle < 60){angle = 60;}
+        int angle = SERVO_POS_3 + error;
+        if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
+        if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
         this->frontDrive->setWheelAngle(angle);
     }
 }
