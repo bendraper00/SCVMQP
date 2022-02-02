@@ -52,6 +52,9 @@ void DriveModule::pidSpeed(uint8_t target){
   if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
     this->driveSpeed(0);
   }
+  else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
+    offGround = false;
+  }
   else if(readyToPID){
     readyToPID = 0;
     int effort = this->speedPID->calcPIDSpeed(target, speedCounts, MAX_DRIVE_SPEED);
