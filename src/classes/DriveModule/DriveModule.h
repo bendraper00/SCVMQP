@@ -16,12 +16,13 @@ class DriveModule{
                   const uint8_t chB,
                   const uint8_t servoPin);
       void init();
-      void driveSpeed(uint8_t target);
-      void pidSpeed(uint8_t target);
+      void driveSpeed(int16_t target);
+      void pidSpeed(int16_t target);
       boolean setWheelAngle(int8_t target);
       boolean driveDist(float target);
       //turn robot or Skid Steer (can only occur when wheel axis colinear)
       boolean moving = false;
+      static void ButtonISR();
       Encoder* enc;
       Servo servo;
 

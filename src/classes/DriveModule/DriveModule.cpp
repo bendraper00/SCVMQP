@@ -3,7 +3,7 @@
 
 volatile uint8_t readyToPID = 0;
 Encoder* encP;
-volatile int16_t speedCounts = 0;
+volatile int32_t speedCounts = 0;
 boolean offGround = false;
 uint32_t timeOffGround = 0;
 
@@ -32,10 +32,10 @@ void DriveModule::init(){
   interrupts();
   sei();
 
-  attachInterrupt(FRONT_DRIVE_BUTTON, ButtonISR, FALLING);
+  attachInterrupt(FRONT_DRIVE_BUTTON, DriveModule::ButtonISR, FALLING);
 }
 
-void DriveModule::driveSpeed(uint8_t target){
+void DriveModule::driveSpeed(int16_t target){
     this->motor->setSpeed(abs(target));
     if(target > 0){
       this->motor->forward();
@@ -48,18 +48,18 @@ void DriveModule::driveSpeed(uint8_t target){
     }
 }
 
-void DriveModule::pidSpeed(uint8_t target){
-  if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
-    this->driveSpeed(0);
-  }
-  else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
-    offGround = false;
-  }
+void DriveModule::pidSpeed(int16_t target){
+   if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
+     this->driveSpeed(0);
+   }
+   else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
+     offGround = false;
+   }
   else if(readyToPID){
     readyToPID = 0;
     int effort = this->speedPID->calcPIDSpeed(target, speedCounts, MAX_DRIVE_SPEED);
     this->driveSpeed(effort);
-    Serial.println(effort);
+    //Serial.println(encP->getCounts());
   }
 }
 
@@ -133,7 +133,7 @@ ISR(TIMER3_COMPA_vect)
   readyToPID = 1;
 }
 
-ButtonISR(){
+void DriveModule::ButtonISR(){
   offGround = true;
   timeOffGround = millis();
 }

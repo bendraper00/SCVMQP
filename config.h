@@ -3,26 +3,28 @@
 
 /*
 NOTES:
-- Do not use analogWrite functions on pins 2,3, or 5. They depend on Timer3
+- Do not use analogWrite functions on pins 2,3,5,11,12,13. They depend on Timer3 and Timer 1(ir remote)
 - Encoder Channel A needs to be an interrupt
 - Servo pins need to be PWM capable pins
 */
 
 //Pins Assignments
 static const uint8_t FRONT_ENCODER_A = 2;
-static const uint8_t FRONT_ENCODER_B = 51;
-static const uint8_t FRONT_DRIVE_EN = 11;
-static const uint8_t FRONT_DRIVE_IN1 = 53;
-static const uint8_t FRONT_DRIVE_IN2 = 52;
-static const uint8_t FRONT_DRIVE_SERVO = 9;
+static const uint8_t FRONT_ENCODER_B = 29;
+static const uint8_t FRONT_DRIVE_EN = 4;
+static const uint8_t FRONT_DRIVE_IN1 = 52;
+static const uint8_t FRONT_DRIVE_IN2 = 53;
+static const uint8_t FRONT_DRIVE_SERVO = 7;
 static const uint8_t FRONT_DRIVE_BUTTON = 37;
 
-static const REAR_ENCODER_A = 0;
-static const REAR_ENCODER_B = 0;
-static const REAR_DRIVE_EN = 0;
-static const REAR_DRIVE_IN1 = 0;
-static const REAR_DRIVE_IN2 = 0;
-static const REAR_DRIVE_SERVO = 0;
+static const uint8_t REAR_ENCODER_A = 3;
+static const uint8_t REAR_ENCODER_B = 49;
+static const uint8_t REAR_DRIVE_EN = 6;
+static const uint8_t REAR_DRIVE_IN1 = 51;
+static const uint8_t REAR_DRIVE_IN2 = 50;
+static const uint8_t REAR_DRIVE_SERVO = 8;
+
+static const int IR_REMOTE_SIGNAL = 47;
 
 //-------------------------------------------//
 
@@ -46,10 +48,13 @@ static const float PID_DIST_KI = 0.0;
 static const float PID_DIST_KD = 0.0;
 
 static const int LOX1_ADDRESS = 0x30;
-static const int LOX2_ADDRESS 0x31;
-static const int LOX1_SHT 30;
-static const int LOX2_SHT 31;
+static const int LOX2_ADDRESS = 0x31;
+static const int LOX1_SHT = 30;
+static const int LOX2_SHT = 31;
 static const int TOF_SENSOR_COUNT = 2;
+static const int TOF_PERIOD = 10;
+
+
 
 
 #endif

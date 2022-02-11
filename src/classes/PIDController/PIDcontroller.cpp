@@ -8,18 +8,20 @@ PIDController::PIDController(float p, float i, float d){
   this->kd = d;
 }
 
-int PIDController::calcPIDSpeed(uint8_t target, int16_t curr, uint16_t cap){
+int PIDController::calcPIDSpeed(int16_t target, int16_t curr, int16_t cap){
   noInterrupts();
-  int16_t actual = curr - prev;
-  prev = curr;
+  int16_t actual = curr - this->prev;
+  //Serial.println(actual);
+  this->prev = curr;
   interrupts();
 
   int16_t error = target - actual;
-  errorSum += error;
-
-  int output = kp*error + ki*errorSum;
+  this->errorSum += error;
+  int32_t output = kp*error + ki*this->errorSum;
+  
   if(output > cap){output = cap;}
-  if(output < -1*cap){output = -1*cap;}
 
+  if(output < -1*cap){output = -1*cap;}
+  
   return output;
 }

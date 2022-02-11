@@ -9,10 +9,12 @@ class Robot{
         Robot();
         void init();
         DriveModule* frontDrive;
-        Sensors tofSensor;
+        DriveModule* rearDrive;
+        //Sensors tofSensor;
 
-        void stairFollow(uint8_t speed, uint8_t dist);
+        //void stairFollow(uint8_t speed, uint8_t dist);
         
     private:
 };
+
 #endif

@@ -1,6 +1,6 @@
 #include "Encoder.h"
-byte statPinA;
-byte statPinB;
+uint8_t statPinA;
+uint8_t statPinB;
 volatile uint32_t statCounts = 0;
 volatile uint32_t statCountsBack = 0; //Will eventually need this
 
@@ -36,10 +36,13 @@ int16_t Encoder::distToCounts(float dist){
 }
 void Encoder::encoderISR(){
     //turn off interrupts... I think
-    if(digitalRead(statPinA) && !digitalRead(statPinB)){
+    Serial.println(digitalRead(statPinB));
+    if(!digitalRead(statPinB)){
+        //Serial.println("FORWARD");
         statCounts++;
     }
-    if(digitalRead(statPinA) && digitalRead(statPinB)){
+    else{
+        //Serial.println("BACKWARD");
         statCounts--;
     } 
 }
