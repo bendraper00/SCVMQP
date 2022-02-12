@@ -3,19 +3,23 @@
 
 volatile uint8_t readyToPID = 0;
 Encoder* encP;
-volatile int32_t speedCounts = 0;
+volatile int32_t frontSpeedCounts = 0;
+volatile int32_t rearSpeedCounts = 0;
 boolean offGround = false;
 uint32_t timeOffGround = 0;
 
-DriveModule::DriveModule(const uint8_t EN, const uint8_t IN1, const uint8_t IN2, const uint8_t chA, const uint8_t chB, const uint8_t servoPin){
+DriveModule::DriveModule(const uint8_t EN, 
+                         const uint8_t IN1, 
+                         const uint8_t IN2, 
+                         Encoder* enc,
+                         const uint8_t servoPin){
   this->motor = new L298N(EN, IN1, IN2);
-  this->enc = new Encoder(chA, chB);
+  this->enc = enc;
   this->servoPin = servoPin;
   this->speedPID = new PIDController(PID_SPEED_KP, PID_SPEED_KI, PID_SPEED_KD);
 }
 
 void DriveModule::init(){
-  this->enc->init();
   encP = this->enc; //For ISR
   this->servo.attach(this->servoPin);
   noInterrupts();
@@ -31,7 +35,6 @@ void DriveModule::init(){
   TIMSK3 = (1<<OCIE3A);
   interrupts();
   sei();
-
   attachInterrupt(FRONT_DRIVE_BUTTON, DriveModule::ButtonISR, FALLING);
 }
 
@@ -48,7 +51,7 @@ void DriveModule::driveSpeed(int16_t target){
     }
 }
 
-void DriveModule::pidSpeed(int16_t target){
+void DriveModule::pidRSpeed(int16_t target){
    if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
      this->driveSpeed(0);
    }
@@ -57,9 +60,22 @@ void DriveModule::pidSpeed(int16_t target){
    }
   else if(readyToPID){
     readyToPID = 0;
-    int effort = this->speedPID->calcPIDSpeed(target, speedCounts, MAX_DRIVE_SPEED);
+    int effort = this->speedPID->calcPIDSpeed(target, rearSpeedCounts, MAX_DRIVE_SPEED);
     this->driveSpeed(effort);
-    //Serial.println(encP->getCounts());
+  }
+}
+
+void DriveModule::pidFSpeed(int16_t target){
+   if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
+     this->driveSpeed(0);
+   }
+   else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
+     offGround = false;
+   }
+  else if(readyToPID){
+    readyToPID = 0;
+    int effort = this->speedPID->calcPIDSpeed(target, frontSpeedCounts, MAX_DRIVE_SPEED);
+    this->driveSpeed(effort);
   }
 }
 
@@ -78,7 +94,7 @@ boolean DriveModule::driveDist(float target){
   boolean status = false;
   static uint16_t effortSpeed = 0;
   this->enc->updateCounts();
-  int16_t currCounts = this->enc->getCounts();
+  int16_t currCounts = this->enc->getFrontCounts();
 
   //Serial.println("STATE: " + String(state) + "\t\tEffort: " + String(effortSpeed) + "\t\tDirection: " + String(dir));
   //Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts) + "\t\tERROR: " + String(error));
@@ -129,7 +145,8 @@ boolean DriveModule::driveDist(float target){
 ISR(TIMER3_COMPA_vect)
 {
   encP->updateCounts();
-  speedCounts = encP->getCounts();
+  frontSpeedCounts = encP->getFrontCounts();
+  rearSpeedCounts = encP->getRearCounts();
   readyToPID = 1;
 }
 

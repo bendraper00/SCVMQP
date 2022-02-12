@@ -1,28 +1,39 @@
 #include "Encoder.h"
-uint8_t statPinA;
-uint8_t statPinB;
-volatile uint32_t statCounts = 0;
-volatile uint32_t statCountsBack = 0; //Will eventually need this
+uint8_t statPinFA;
+uint8_t statPinFB;
+uint8_t statPinRA;
+uint8_t statPinRB;
+volatile uint32_t statFrontCounts = 0;
+volatile uint32_t statRearCounts = 0;
 
-Encoder::Encoder(uint8_t pinA,uint8_t pinB){
-    this->pinA = pinA;
-    statPinA = pinA;
-    this->pinB = pinB;
-    statPinB = pinB;
+Encoder::Encoder(uint8_t pinFA, uint8_t pinFB, uint8_t pinRA, uint8_t pinRB){
+    this->pinFA = pinFA;
+    statPinFA = pinFA;
+    this->pinFB = pinFB;
+    statPinFB = pinFB;
+
+    this->pinRA = pinRA;
+    statPinRA = pinRA;
+    this->pinRB = pinRB;
+    statPinRB = pinRB;
 }
 void Encoder:: init(){
-    pinMode(this->pinA, INPUT);
-    pinMode(this->pinB, INPUT);
-    attachInterrupt(digitalPinToInterrupt(this->pinA), Encoder::encoderISR, RISING);
+    pinMode(this->pinFA, INPUT);
+    pinMode(this->pinFB, INPUT);
+    pinMode(this->pinRA, INPUT);
+    pinMode(this->pinRB, INPUT);
+    attachInterrupt(digitalPinToInterrupt(this->pinFA), Encoder::encoderFISR, RISING);
+    attachInterrupt(digitalPinToInterrupt(this->pinRA), Encoder::encoderRISR, RISING);
 }
-int16_t Encoder::getCounts(){
-    return this->counts;
+int16_t Encoder::getFrontCounts(){
+    return this->frontCounts;
+}
+int16_t Encoder::getRearCounts(){
+    return this->rearCounts;
 }
 void Encoder::updateCounts(){
-    this->counts = statCounts;
-}
-void Encoder::updatePrevCounts(){
-    this->prevCounts = this->counts;
+    this->frontCounts = statFrontCounts;
+    this->rearCounts = statRearCounts;
 }
 float Encoder::calcDist(int16_t start, int16_t end){
     //800 Counts per revolution
@@ -34,15 +45,22 @@ int16_t Encoder::distToCounts(float dist){
     uint16_t counts = dist/ENCODER_COUNTS_TO_MM; //possibly problematic idk if this will round to nearest count
     return counts;
 }
-void Encoder::encoderISR(){
+
+void Encoder::encoderFISR(){
     //turn off interrupts... I think
-    Serial.println(digitalRead(statPinB));
-    if(!digitalRead(statPinB)){
-        //Serial.println("FORWARD");
-        statCounts++;
+    if(!digitalRead(statPinFB)){
+        statFrontCounts++;
     }
     else{
-        //Serial.println("BACKWARD");
-        statCounts--;
+        statFrontCounts--;
+    } 
+}
+void Encoder::encoderRISR(){
+    //turn off interrupts... I think
+    if(!digitalRead(statPinRB)){
+        statRearCounts++;
+    }
+    else{
+        statRearCounts--;
     } 
 }

@@ -11,7 +11,6 @@ PIDController::PIDController(float p, float i, float d){
 int PIDController::calcPIDSpeed(int16_t target, int16_t curr, int16_t cap){
   noInterrupts();
   int16_t actual = curr - this->prev;
-  //Serial.println(actual);
   this->prev = curr;
   interrupts();
 

@@ -5,18 +5,21 @@
 #include "../../../config.h"
 class Encoder{
     public:
-        Encoder(uint8_t pinA, uint8_t pinB);
+        Encoder(uint8_t pinFA, uint8_t pinFB, uint8_t pinRA, uint8_t pinRB);
         void init();
-        int16_t getCounts();
+        int16_t getFrontCounts();
+        int16_t getRearCounts();
         void updateCounts();
-        void updatePrevCounts();
         float calcDist(int16_t start, int16_t end);
-        static void encoderISR();
+        static void encoderFISR();
+        static void encoderRISR();
         int16_t distToCounts(float);
     private:
-        uint8_t pinA;
-        uint8_t pinB;
-        int32_t counts;
-        int32_t prevCounts;
+        uint8_t pinFA;
+        uint8_t pinFB;
+        uint8_t pinRA;
+        uint8_t pinRB;
+        int32_t frontCounts;
+        int32_t rearCounts;
 };
 #endif

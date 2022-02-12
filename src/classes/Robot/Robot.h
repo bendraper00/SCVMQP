@@ -10,6 +10,7 @@ class Robot{
         void init();
         DriveModule* frontDrive;
         DriveModule* rearDrive;
+        Encoder* encoders;
         //Sensors tofSensor;
 
         //void stairFollow(uint8_t speed, uint8_t dist);

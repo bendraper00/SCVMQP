@@ -9,19 +9,19 @@ NOTES:
 */
 
 //Pins Assignments
-static const uint8_t FRONT_ENCODER_A = 2;
-static const uint8_t FRONT_ENCODER_B = 29;
+static const uint8_t FRONT_ENCODER_A = 3;
+static const uint8_t FRONT_ENCODER_B = 53;
 static const uint8_t FRONT_DRIVE_EN = 4;
 static const uint8_t FRONT_DRIVE_IN1 = 52;
-static const uint8_t FRONT_DRIVE_IN2 = 53;
-static const uint8_t FRONT_DRIVE_SERVO = 7;
-static const uint8_t FRONT_DRIVE_BUTTON = 37;
+static const uint8_t FRONT_DRIVE_IN2 = 51;
+static const uint8_t FRONT_DRIVE_SERVO = 6;
+static const uint8_t FRONT_DRIVE_BUTTON = 0;
 
-static const uint8_t REAR_ENCODER_A = 3;
-static const uint8_t REAR_ENCODER_B = 49;
-static const uint8_t REAR_DRIVE_EN = 6;
-static const uint8_t REAR_DRIVE_IN1 = 51;
-static const uint8_t REAR_DRIVE_IN2 = 50;
+static const uint8_t REAR_ENCODER_A = 18;
+static const uint8_t REAR_ENCODER_B = 50;
+static const uint8_t REAR_DRIVE_EN = 7;
+static const uint8_t REAR_DRIVE_IN1 = 49;
+static const uint8_t REAR_DRIVE_IN2 = 48;
 static const uint8_t REAR_DRIVE_SERVO = 8;
 
 static const int IR_REMOTE_SIGNAL = 47;
@@ -40,8 +40,8 @@ static const uint8_t SERVO_POS_3 = 90;
 static const uint8_t SERVO_POS_4 = 120;
 
 //PID VALUES
-static const float PID_SPEED_KP = 3.0;
-static const float PID_SPEED_KI = 0.5;
+static const float PID_SPEED_KP = 1.0;
+static const float PID_SPEED_KI = 1.0;
 static const float PID_SPEED_KD = 0.0;
 static const float PID_DIST_KP = 2.0;
 static const float PID_DIST_KI = 0.0;
