@@ -11,10 +11,11 @@ IRrecv ir(IR_REMOTE_SIGNAL);
 //Temp Variables for testing
 uint32_t prevt = 0;
 
-enum command{FORWARD, BACKWARD, LEFTSKID, RIGHTSKID, LATERAL, LEFT, RIGHT, STOP};
+enum command{MOVING, STOP};
 command state = STOP;
 command prevState = STOP;
 bool lateral = false;
+L298N worm(12, 38, 39);
 
 void setup()
 {
@@ -23,97 +24,29 @@ void setup()
   ir.enableIRIn();
   bot.frontDrive->setWheelAngle(90);
   bot.rearDrive->setWheelAngle(90);
+  
+  void stopMotor();
+  state = MOVING;
+  pinMode(19, INPUT);
+  attachInterrupt(digitalPinToInterrupt(19), stopMotor, RISING);
 }
 
 
 void loop()
 {
-  if(millis()-prevt > 115){
-    state = STOP;
-  }
-  if(ir.decode()){
-    prevt = millis();
-    int comm = ir.decodedIRData.command;
-
-    if(comm == 70 && lateral == false){state = FORWARD;}
-    else if(comm == 68 && lateral == false){state = LEFTSKID;}
-    else if(comm == 21 && lateral == false){state = BACKWARD;}
-    else if(comm == 67 && lateral == false){state = RIGHTSKID;}
-
-    else if(comm == 64 && prevState != LATERAL){state = LATERAL;}
-
-    else if(comm == 68 && lateral == true){state = LEFT;}
-    else if(comm == 21 && lateral == true){state = STOP;}
-    else if(comm == 70 && lateral == true){state = STOP;}
-    else if(comm == 67 && lateral == true){state = RIGHT;}
-    
-    else{state = STOP;}
-
-    ir.resume();
-  }
-
   switch(state){
-    case FORWARD:
-      bot.frontDrive->driveSpeed(120);
-      bot.rearDrive->driveSpeed(120);
-      prevState = FORWARD;
-      break;
-
-    case BACKWARD:
-      bot.frontDrive->driveSpeed(-120);
-      bot.rearDrive->driveSpeed(-120);
-      prevState = BACKWARD;
-      break;
-
-    case LEFTSKID:
-      bot.frontDrive->driveSpeed(120);
-      bot.rearDrive->driveSpeed(-120);
-      prevState = LEFTSKID;
-      break;
-
-    case RIGHTSKID:
-      bot.frontDrive->driveSpeed(-120);
-      bot.rearDrive->driveSpeed(120);
-      prevState = RIGHTSKID;
-      break;
-
-    case LATERAL:
-      if(lateral == true){
-        bot.frontDrive->setWheelAngle(90);
-        bot.rearDrive->setWheelAngle(90);
-        lateral = false;
-      }
-      else{
-        bot.frontDrive->setWheelAngle(0);
-        bot.rearDrive->setWheelAngle(0);
-        lateral = true;
-      }
-      prevState = LATERAL;
-      break;
-
-    case LEFT:
-      bot.frontDrive->driveSpeed(-120);
-      bot.rearDrive->driveSpeed(-120);
-      prevState = LEFT;
-      break;
-
-    case RIGHT:
-      bot.frontDrive->driveSpeed(120);
-      bot.rearDrive->driveSpeed(120);
-      prevState = RIGHT;
-      break;
+    case MOVING:
+      worm.setSpeed(150);
+      worm.forward();
+    break;
 
     case STOP:
-      bot.frontDrive->driveSpeed(0);
-      bot.rearDrive->driveSpeed(0);
-      prevState = STOP;
-      break;
-
-    default:
-      bot.frontDrive->driveSpeed(0);
-      bot.rearDrive->driveSpeed(0);
-      prevState = STOP;
-      break;
-
+      worm.stop();
+    break;
   }
 }
+
+void stopMotor(){
+  state = STOP;
+}
+  

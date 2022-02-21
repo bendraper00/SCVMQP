@@ -35,7 +35,7 @@ void DriveModule::init(){
   TIMSK3 = (1<<OCIE3A);
   interrupts();
   sei();
-  attachInterrupt(FRONT_DRIVE_BUTTON, DriveModule::ButtonISR, FALLING);
+  attachInterrupt(digitalPinToInterrupt(FRONT_DRIVE_BUTTON), DriveModule::ButtonISR, FALLING);
 }
 
 void DriveModule::driveSpeed(int16_t target){

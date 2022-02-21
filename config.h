@@ -9,20 +9,33 @@ NOTES:
 */
 
 //Pins Assignments
-static const uint8_t FRONT_ENCODER_A = 3;
-static const uint8_t FRONT_ENCODER_B = 53;
-static const uint8_t FRONT_DRIVE_EN = 4;
-static const uint8_t FRONT_DRIVE_IN1 = 52;
-static const uint8_t FRONT_DRIVE_IN2 = 51;
-static const uint8_t FRONT_DRIVE_SERVO = 6;
-static const uint8_t FRONT_DRIVE_BUTTON = 0;
+static const uint8_t FRONT_ENCODER_A = 3; //INTERRUPT
+static const uint8_t FRONT_ENCODER_B = 53; //DIGITAL
+static const uint8_t FRONT_DRIVE_EN = 4; //PWM
+static const uint8_t FRONT_DRIVE_IN1 = 52; //DIGITAL
+static const uint8_t FRONT_DRIVE_IN2 = 51; //DIGITAL
+static const uint8_t FRONT_DRIVE_SERVO = 6; //PWM
+static const uint8_t FRONT_DRIVE_BUTTON = 0; //DIGITAL
 
-static const uint8_t REAR_ENCODER_A = 18;
-static const uint8_t REAR_ENCODER_B = 50;
-static const uint8_t REAR_DRIVE_EN = 7;
-static const uint8_t REAR_DRIVE_IN1 = 49;
-static const uint8_t REAR_DRIVE_IN2 = 48;
-static const uint8_t REAR_DRIVE_SERVO = 8;
+static const uint8_t REAR_ENCODER_A = 18; //INTERRUPT
+static const uint8_t REAR_ENCODER_B = 50; //DIGITAL
+static const uint8_t REAR_DRIVE_EN = 7; //PWM
+static const uint8_t REAR_DRIVE_IN1 = 49; //DIGITAL
+static const uint8_t REAR_DRIVE_IN2 = 48; //DIGITAL
+static const uint8_t REAR_DRIVE_SERVO = 8; //PWM
+
+static const uint8_t FRONT_OPEN_ENDSTOP = 0; //INTERRUPT
+static const uint8_t FRONT_CLOSED_ENDSTOP = 0; //INTERRUPT
+static const uint8_t FRONT_SCISSOR_EN = 0; //PWM
+static const uint8_t FRONT_SCISSOR_IN1 = 0; //DIGITAL
+static const uint8_t FRONT_SCISSOR_IN2 = 0; //DIGITAL
+
+static const uint8_t REAR_OPEN_ENDSTOP = 0; //INTERRUPT
+static const uint8_t REAR_CLOSED_ENDSTOP = 0; //INTERRUPT
+static const uint8_t REAR_SCISSOR_EN = 0; //PWM
+static const uint8_t REAR_SCISSOR_IN1 = 0; //DIGITAL
+static const uint8_t REAR_SCISSOR_IN2 = 0; //DIGITAL
+
 
 static const int IR_REMOTE_SIGNAL = 47;
 
@@ -46,6 +59,9 @@ static const float PID_SPEED_KD = 0.0;
 static const float PID_DIST_KP = 2.0;
 static const float PID_DIST_KI = 0.0;
 static const float PID_DIST_KD = 0.0;
+static const float PID_SCISSOR_KP = 1.0;
+static const float PID_SCISSOR_KI = 1.0;
+static const float PID_SCISSOR_KD = 0.0;
 
 static const int LOX1_ADDRESS = 0x30;
 static const int LOX2_ADDRESS = 0x31;
