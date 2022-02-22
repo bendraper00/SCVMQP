@@ -5,7 +5,7 @@ volatile uint8_t readyToPID = 0;
 Encoder* encP;
 volatile int32_t frontSpeedCounts = 0;
 volatile int32_t rearSpeedCounts = 0;
-boolean offGround = false;
+bool offGround = false;
 uint32_t timeOffGround = 0;
 
 DriveModule::DriveModule(const uint8_t EN, 

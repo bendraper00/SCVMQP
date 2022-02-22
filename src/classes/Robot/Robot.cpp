@@ -18,7 +18,7 @@ void Robot::init(){
                                        REAR_DRIVE_SERVO);
     this->frontDrive->init();
     this->rearDrive->init();
-    //this->tofSensor.init();
+    this->sensors.init();
 }
 
 // void Robot::stairFollow(uint8_t speed, uint8_t dist){
