@@ -18,24 +18,32 @@ void Robot::init(){
                                        REAR_DRIVE_SERVO);
     this->frontDrive->init();
     this->rearDrive->init();
+    this->sensors = new Sensors();
     this->sensors.init();
+    this->scissors = new Scissors();
+    this->scissors->init
 }
 
-// void Robot::stairFollow(uint8_t speed, uint8_t dist){
-//     this->frontDrive->driveSpeed(speed);
+void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try to maintain equal counts rather than speeds. Will determine in testing
+    this->frontDrive->pidFSpeed(speed);
+    this->frontDrive->pidRSpeed(speed):
+}
 
-//     if(speed > 0){
-//         int error = dist - tofSensor.getRange();
-//         int angle = SERVO_POS_3 + error;
-//         if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
-//         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
-//         this->frontDrive->setWheelAngle(angle);
-//     }
-//     if(speed < 0){
-//         int error = tofSensor.getRange() - dist; //negative error
-//         int angle = SERVO_POS_3 + error;
-//         if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
-//         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
-//         this->frontDrive->setWheelAngle(angle);
-//     }
-// }
+void Robot::stairFollow(uint8_t speed, uint8_t dist){
+    this->frontDrive->driveSpeed(speed);
+
+    if(speed > 0){
+        int error = dist - sensors->getRangeMagnitude();
+        int angle = SERVO_POS_3 + error;
+        if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
+        if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
+        this->frontDrive->setWheelAngle(angle);
+    }
+    if(speed < 0){
+        int error = sensors->getRangeMagnitude() - dist; //negative error
+        int angle = SERVO_POS_3 + error;
+        if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
+        if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
+        this->frontDrive->setWheelAngle(angle);
+    }
+}

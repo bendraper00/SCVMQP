@@ -17,7 +17,7 @@ class DriveModule{
       void init();
       void driveSpeed(int16_t target);
       void pidRSpeed(int16_t target);
-       void pidFSpeed(int16_t target);
+      void pidFSpeed(int16_t target);
       bool setWheelAngle(int8_t target);
       bool driveDist(float target);
       //turn robot or Skid Steer (can only occur when wheel axis colinear)

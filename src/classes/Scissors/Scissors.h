@@ -10,6 +10,7 @@ class Scissors{
         Scissors();
         void init();
         static void scissorISR();
+        
     private:
         L298N* frontMotor;
         L298N* rearMotor;
