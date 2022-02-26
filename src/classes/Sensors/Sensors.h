@@ -20,5 +20,6 @@ class Sensors{
         Adafruit_VL6180X sensA;
         Adafruit_VL6180X sensB;
         Adafruit_VL6180X* sens[];
+        L3G gyro;
 };
 #endif

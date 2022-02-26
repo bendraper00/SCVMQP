@@ -56,9 +56,11 @@ static const uint8_t SERVO_POS_4 = 120;
 static const float PID_SPEED_KP = 1.0;
 static const float PID_SPEED_KI = 1.0;
 static const float PID_SPEED_KD = 0.0;
+
 static const float PID_DIST_KP = 2.0;
 static const float PID_DIST_KI = 0.0;
 static const float PID_DIST_KD = 0.0;
+
 static const float PID_SCISSOR_KP = 1.0;
 static const float PID_SCISSOR_KI = 1.0;
 static const float PID_SCISSOR_KD = 0.0;
@@ -70,7 +72,7 @@ static const int LOX2_SHT = 31;
 static const int TOF_SENSOR_COUNT = 2;
 static const int TOF_PERIOD = 10;
 
-
+static const int GYRO_ADDRESS = 0x32;
 
 
 #endif

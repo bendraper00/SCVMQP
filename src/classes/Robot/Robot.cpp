@@ -22,6 +22,7 @@ void Robot::init(){
     this->sensors.init();
     this->scissors = new Scissors();
     this->scissors->init
+    this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);
 }
 
 void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try to maintain equal counts rather than speeds. Will determine in testing
@@ -46,4 +47,14 @@ void Robot::stairFollow(uint8_t speed, uint8_t dist){
         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
         this->frontDrive->setWheelAngle(angle);
     }
+}
+
+void raiseFront(){
+    this->scissors->openFront(120);
+}
+void raiseMid(){
+
+}
+void raiseRear(){
+
 }
