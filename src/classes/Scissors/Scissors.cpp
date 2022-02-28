@@ -1,8 +1,7 @@
 #include "Scissors.h"
 
-enum ScissorState{OPENING, CLOSING, OPEN, CLOSED};
-ScissorState frontState = CLOSED;
-ScissorState rearState = CLOSED;
+Scissors::ScissorState frontState;
+Scissors::ScissorState rearState;
 
 Scissors::Scissors(){
     this->frontMotor = new L298N(FRONT_SCISSOR_EN, FRONT_SCISSOR_IN1, FRONT_SCISSOR_IN2);
@@ -12,6 +11,9 @@ Scissors::Scissors(){
     this->frontClosedEs = FRONT_CLOSED_ENDSTOP;
     this->rearOpenEs = REAR_OPEN_ENDSTOP;
     this->rearClosedEs = REAR_CLOSED_ENDSTOP;
+
+    frontState = CLOSED;
+    rearState = CLOSED;
 }
 
 void Scissors::init(){
@@ -52,7 +54,7 @@ void Scissors::rearSpeed(int16_t speed){
 }
 
 void Scissors::openFront(int16_t speed){
-    if(frontState == CLOSED){frontState = OPENING};
+    if(frontState == CLOSED){frontState = OPENING;}
     switch (frontState){
         case OPENING:
             //Run motors
@@ -72,7 +74,7 @@ void Scissors::openFront(int16_t speed){
 }
 
 void Scissors::closeFront(int16_t speed){
-    if(frontState == OPEN){frontState = CLOSING};
+    if(frontState == OPEN){frontState = CLOSING;}
     switch (frontState){
         case OPENING:
             //Error case
@@ -92,7 +94,7 @@ void Scissors::closeFront(int16_t speed){
 }
 
 void Scissors::openRear(int16_t speed){
-    if(rearState == CLOSED){rearState = OPENING};
+    if(rearState == CLOSED){rearState = OPENING;}
     switch (rearState){
         case OPENING:
             //Run motors
@@ -112,7 +114,7 @@ void Scissors::openRear(int16_t speed){
 }
 
 void Scissors::closeRear(int16_t speed){
-    if(frontState == OPEN){frontState = CLOSING};
+    if(frontState == OPEN){frontState = CLOSING;}
     switch (frontState){
         case OPENING:
             //Error case
@@ -136,17 +138,21 @@ void Scissors::scissorFOISR(){
     return;
 }
 
+/*
 void Scissors::scissorFCISR(){
     frontState = CLOSED;
     return;
 }
+*/
 
 void Scissors::scissorROISR(){
     rearState = OPEN;
     return;
 }
 
+/*
 void Scissors::scissorRCISR(){
     rearState = CLOSED;
     return;
 }
+*/

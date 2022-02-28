@@ -19,15 +19,15 @@ void Robot::init(){
     this->frontDrive->init();
     this->rearDrive->init();
     this->sensors = new Sensors();
-    this->sensors.init();
+    this->sensors->init();
     this->scissors = new Scissors();
-    this->scissors->init()
+    this->scissors->init();
     this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);
 }
 
 void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try to maintain equal counts rather than speeds. Will determine in testing
     this->frontDrive->pidFSpeed(speed);
-    this->frontDrive->pidRSpeed(speed):
+    this->frontDrive->pidRSpeed(speed);
 }
 
 void Robot::stairFollow(uint8_t speed, uint8_t dist){
@@ -49,12 +49,12 @@ void Robot::stairFollow(uint8_t speed, uint8_t dist){
     }
 }
 
-void raiseFront(){
+void Robot::raiseFront(){
     this->scissors->openFront(120);
 }
-void raiseMid(){
+void Robot::raiseMid(){
 
 }
-void raiseRear(){
+void Robot::raiseRear(){
 
 }
