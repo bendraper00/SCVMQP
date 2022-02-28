@@ -9,32 +9,33 @@ NOTES:
 */
 
 //Pins Assignments
-static const uint8_t FRONT_ENCODER_A = 3; //INTERRUPT
-static const uint8_t FRONT_ENCODER_B = 53; //DIGITAL
-static const uint8_t FRONT_DRIVE_EN = 4; //PWM
-static const uint8_t FRONT_DRIVE_IN1 = 52; //DIGITAL
-static const uint8_t FRONT_DRIVE_IN2 = 51; //DIGITAL
-static const uint8_t FRONT_DRIVE_SERVO = 6; //PWM
-static const uint8_t FRONT_DRIVE_BUTTON = 0; //DIGITAL
+static const uint8_t FRONT_ENCODER_A = 18; //INTERRUPT
+static const uint8_t FRONT_ENCODER_B = 34; //DIGITAL
+static const uint8_t FRONT_DRIVE_EN = 9; //PWM
+static const uint8_t FRONT_DRIVE_IN1 = 22; //DIGITAL
+static const uint8_t FRONT_DRIVE_IN2 = 24; //DIGITAL
+static const uint8_t FRONT_DRIVE_SERVO = 8; //PWM
+static const uint8_t FRONT_DRIVE_BUTTON = 44; //DIGITAL
 
-static const uint8_t REAR_ENCODER_A = 18; //INTERRUPT
-static const uint8_t REAR_ENCODER_B = 50; //DIGITAL
-static const uint8_t REAR_DRIVE_EN = 7; //PWM
-static const uint8_t REAR_DRIVE_IN1 = 49; //DIGITAL
-static const uint8_t REAR_DRIVE_IN2 = 48; //DIGITAL
-static const uint8_t REAR_DRIVE_SERVO = 8; //PWM
+static const uint8_t REAR_ENCODER_A = 19; //INTERRUPT
+static const uint8_t REAR_ENCODER_B = 35; //DIGITAL
+static const uint8_t REAR_DRIVE_EN = 6; //PWM
+static const uint8_t REAR_DRIVE_IN1 = 23; //DIGITAL
+static const uint8_t REAR_DRIVE_IN2 = 25; //DIGITAL
+static const uint8_t REAR_DRIVE_SERVO = 4; //PWM
+static const uint8_t REAR_DRIVE_BUTTON = 45; //DIGITAL
 
-static const uint8_t FRONT_OPEN_ENDSTOP = 0; //INTERRUPT
-static const uint8_t FRONT_CLOSED_ENDSTOP = 0; //INTERRUPT
-static const uint8_t FRONT_SCISSOR_EN = 0; //PWM
-static const uint8_t FRONT_SCISSOR_IN1 = 0; //DIGITAL
-static const uint8_t FRONT_SCISSOR_IN2 = 0; //DIGITAL
+static const uint8_t FRONT_OPEN_ENDSTOP = 3; //INTERRUPT
+static const uint8_t FRONT_CLOSED_ENDSTOP = 48; //INTERRUPT
+static const uint8_t FRONT_SCISSOR_EN = 10; //PWM
+static const uint8_t FRONT_SCISSOR_IN1 = 26; //DIGITAL
+static const uint8_t FRONT_SCISSOR_IN2 = 28; //DIGITAL
 
-static const uint8_t REAR_OPEN_ENDSTOP = 0; //INTERRUPT
-static const uint8_t REAR_CLOSED_ENDSTOP = 0; //INTERRUPT
-static const uint8_t REAR_SCISSOR_EN = 0; //PWM
-static const uint8_t REAR_SCISSOR_IN1 = 0; //DIGITAL
-static const uint8_t REAR_SCISSOR_IN2 = 0; //DIGITAL
+static const uint8_t REAR_OPEN_ENDSTOP = 2; //INTERRUPT
+static const uint8_t REAR_CLOSED_ENDSTOP = 53; //INTERRUPT
+static const uint8_t REAR_SCISSOR_EN = 7; //PWM
+static const uint8_t REAR_SCISSOR_IN1 = 27; //DIGITAL
+static const uint8_t REAR_SCISSOR_IN2 = 29; //DIGITAL
 
 
 static const int IR_REMOTE_SIGNAL = 47;
@@ -67,8 +68,8 @@ static const float PID_SCISSOR_KD = 0.0;
 
 static const int LOX1_ADDRESS = 0x30;
 static const int LOX2_ADDRESS = 0x31;
-static const int LOX1_SHT = 30;
-static const int LOX2_SHT = 31;
+static const int LOX1_SHT = 32;
+static const int LOX2_SHT = 33;
 static const int TOF_SENSOR_COUNT = 2;
 static const int TOF_PERIOD = 10;
 

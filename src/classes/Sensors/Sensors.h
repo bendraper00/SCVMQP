@@ -1,7 +1,8 @@
 #ifndef SENSORS_H_
 #define SENSORS_H_
+#include <arduino.h>
 #include <Adafruit_VL6180X.h> //Time of Flight sensor
-#include <L3G4200D.h>
+#include <L3G.h>
 #include <Wire.h>
 #include "../../../config.h"
 
@@ -19,7 +20,8 @@ class Sensors{
     private:
         Adafruit_VL6180X sensA;
         Adafruit_VL6180X sensB;
-        Adafruit_VL6180X* sens[];
+        Adafruit_VL6180X* sens[TOF_SENSOR_COUNT];
         L3G gyro;
 };
+
 #endif

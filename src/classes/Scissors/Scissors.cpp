@@ -20,9 +20,9 @@ void Scissors::init(){
     pinMode(this->rearOpenEs, INPUT_PULLUP);
     pinMode(this->rearClosedEs, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(this->frontOpenEs), Scissors::scissorFOISR, FALLING);
-    attachInterrupt(digitalPinToInterrupt(this->frontClosedEs), Scissors::scissorFCISR, FALLING);
+    //attachInterrupt(digitalPinToInterrupt(this->frontClosedEs), Scissors::scissorFCISR, FALLING);
     attachInterrupt(digitalPinToInterrupt(this->rearOpenEs), Scissors::scissorROISR, FALLING);
-    attachInterrupt(digitalPinToInterrupt(this->rearClosedEs), Scissors::scissorRCISR, FALLING);
+    //attachInterrupt(digitalPinToInterrupt(this->rearClosedEs), Scissors::scissorRCISR, FALLING);
 }
 
 void Scissors::frontSpeed(int16_t speed){

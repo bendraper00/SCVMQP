@@ -31,7 +31,6 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(19), stopMotor, RISING);
 }
 
-
 void loop()
 {
   switch(state){
