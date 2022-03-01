@@ -57,7 +57,7 @@ void Scissors::rearSpeed(int16_t speed){
 ALL OF THE OPEN AND CLOSE FUNCTIONS SHOULD BE RUN IN A LOOP UNTIL THE DESIRED STATE IS MET
 */
 void Scissors::raiseFront(int16_t speed){
-    if(frontState == OPEN){frontState = CLOSING;}
+    if(frontState == OPEN || frontState == OPENING){frontState = CLOSING;}
     switch (frontState){
         case OPENING:
             //Error case
@@ -86,7 +86,7 @@ void Scissors::raiseFront(int16_t speed){
 }
 
 void Scissors::lowerFront(int16_t speed){
-    if(frontState == CLOSED){frontState = OPENING;}
+    if(frontState == CLOSED || frontState == CLOSING){frontState = OPENING;}
     switch (frontState){
         case OPENING:
             if(digitalRead(this->frontOpenEs) == LOW){ //If for some reason you try to lower and the ISR can't run
@@ -112,7 +112,7 @@ void Scissors::lowerFront(int16_t speed){
 }
 
 void Scissors::lowerRear(int16_t speed){
-    if(rearState == OPEN){rearState = CLOSING;}
+    if(rearState == OPEN || rearState == OPENING){rearState = CLOSING;}
     switch (rearState){
         case OPENING:
             //Error Case
@@ -141,7 +141,7 @@ void Scissors::lowerRear(int16_t speed){
 }
 
 void Scissors::raiseRear(int16_t speed){
-    if(rearState == CLOSED){rearState = OPENING;}
+    if(rearState == CLOSED || rearState == CLOSING){rearState = OPENING;}
     switch (rearState){
         case OPENING:
             if(digitalRead(this->rearOpenEs) == LOW){ //If for some reason you try to raise and the ISR can't run

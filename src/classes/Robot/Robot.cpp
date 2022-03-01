@@ -27,7 +27,7 @@ void Robot::init(){
 
 void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try to maintain equal counts rather than speeds. Will determine in testing
     this->frontDrive->pidFSpeed(speed);
-    this->frontDrive->pidRSpeed(speed);
+    this->rearDrive->pidRSpeed(speed);
 }
 
 void Robot::stairFollow(uint8_t speed, uint8_t dist){
@@ -50,11 +50,11 @@ void Robot::stairFollow(uint8_t speed, uint8_t dist){
 }
 
 void Robot::raiseFront(){
-    this->scissors->openFront(120);
+    this->scissors->raiseFront(200);
 }
 void Robot::raiseMid(){
-
+    //Use a gyro axis to keep stage level, speeding up stages to compensate
 }
 void Robot::raiseRear(){
-
+    this->scissors->raiseRear(200);
 }
