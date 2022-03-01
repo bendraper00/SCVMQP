@@ -9,27 +9,26 @@ class Scissors{
     public:
         Scissors();
         void init();
-        void openFront(int16_t speed);
-        void closeFront(int16_t speed);
-        void openRear(int16_t speed);
-        void closeRear(int16_t speed);
+        void raiseFront(int16_t speed);
+        void lowerFront(int16_t speed);
+        void lowerRear(int16_t speed);
+        void raiseRear(int16_t speed);
         static void scissorFOISR();
-        //static void scissorFCISR();
         static void scissorROISR();
-        //static void scissorRCISR();
         void frontSpeed(int16_t speed);
         void rearSpeed(int16_t speed);
+
         enum ScissorState{OPENING, CLOSING, OPEN, CLOSED};
-        ScissorState fState = CLOSED;
-        ScissorState rState = CLOSED;
-        uint8_t frontOpenEs;
-        uint8_t frontClosedEs;
-        uint8_t rearOpenEs;
-        uint8_t rearClosedEs;
+        ScissorState fState = OPEN;
+        ScissorState rState = OPEN;
         
     private:
         L298N* frontMotor;
         L298N* rearMotor;
         PIDController* speedPID;
+        uint8_t frontOpenEs;
+        uint8_t frontClosedEs;
+        uint8_t rearOpenEs;
+        uint8_t rearClosedEs;
 };
 #endif

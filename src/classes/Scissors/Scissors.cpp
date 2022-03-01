@@ -12,8 +12,8 @@ Scissors::Scissors(){
     this->rearOpenEs = REAR_OPEN_ENDSTOP;
     this->rearClosedEs = REAR_CLOSED_ENDSTOP;
 
-    frontState = CLOSED;
-    rearState = CLOSED;
+    frontState = OPEN;
+    rearState = OPEN;
 }
 
 void Scissors::init(){
@@ -22,9 +22,8 @@ void Scissors::init(){
     pinMode(this->rearOpenEs, INPUT_PULLUP);
     pinMode(this->rearClosedEs, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(this->frontOpenEs), Scissors::scissorFOISR, FALLING);
-    //attachInterrupt(digitalPinToInterrupt(this->frontClosedEs), Scissors::scissorFCISR, FALLING);
     attachInterrupt(digitalPinToInterrupt(this->rearOpenEs), Scissors::scissorROISR, FALLING);
-    //attachInterrupt(digitalPinToInterrupt(this->rearClosedEs), Scissors::scissorRCISR, FALLING);
+
 }
 
 void Scissors::frontSpeed(int16_t speed){
@@ -53,106 +52,133 @@ void Scissors::rearSpeed(int16_t speed){
     }
 }
 
-void Scissors::openFront(int16_t speed){
+
+/*
+ALL OF THE OPEN AND CLOSE FUNCTIONS SHOULD BE RUN IN A LOOP UNTIL THE DESIRED STATE IS MET
+*/
+void Scissors::raiseFront(int16_t speed){
+    if(frontState == OPEN){frontState = CLOSING;}
+    switch (frontState){
+        case OPENING:
+            //Error case
+            this->frontSpeed(0);
+            break;
+
+        case CLOSING:
+            if(digitalRead(this->frontClosedEs) == LOW){
+                frontState = CLOSED;
+                break;
+                }
+            this->frontSpeed(speed * -1);
+            break;
+
+        case OPEN:
+        //ERROR CASE
+            this->frontSpeed(0);
+            break;
+
+        case CLOSED:
+            this->frontSpeed(0);
+            break;
+    }
+    this->fState = frontState;
+    this->rState = rearState;
+}
+
+void Scissors::lowerFront(int16_t speed){
     if(frontState == CLOSED){frontState = OPENING;}
     switch (frontState){
         case OPENING:
-            //Run motors
+            if(digitalRead(this->frontOpenEs) == LOW){ //If for some reason you try to lower and the ISR can't run
+                frontState = OPEN;
+                break;
+            }
+            this->frontSpeed(speed);
             break;
         case CLOSING:
-            //Error case
+            //Error Case
+            this->frontSpeed(0);
             break;
         case OPEN:
-            //Do Nothing
+            this->frontSpeed(0);
             break;
         case CLOSED:
             //Error case
+            this->frontSpeed(0);
             break;
     }
     this->fState = frontState;
     this->rState = rearState;
 }
 
-void Scissors::closeFront(int16_t speed){
-    if(frontState == OPEN){frontState = CLOSING;}
-    switch (frontState){
+void Scissors::lowerRear(int16_t speed){
+    if(rearState == OPEN){rearState = CLOSING;}
+    switch (rearState){
         case OPENING:
-            //Error case
+            //Error Case
+            this->rearSpeed(0);
             break;
+
         case CLOSING:
-            //Run motors
+             if(digitalRead(this->rearClosedEs) == LOW){
+                rearState = CLOSED;
+                break;
+            }
+            this->rearSpeed(speed);
             break;
+
         case OPEN:
             //Error case
+            this->rearSpeed(0);
             break;
+
         case CLOSED:
-            //Do Nothing
+            this->rearSpeed(0);
             break;
     }
     this->fState = frontState;
     this->rState = rearState;
 }
 
-void Scissors::openRear(int16_t speed){
+void Scissors::raiseRear(int16_t speed){
     if(rearState == CLOSED){rearState = OPENING;}
     switch (rearState){
         case OPENING:
-            //Run motors
+            if(digitalRead(this->rearOpenEs) == LOW){ //If for some reason you try to raise and the ISR can't run
+                rearState = OPEN;
+                break;
+            }
+            this->rearSpeed(speed * -1);
             break;
+
         case CLOSING:
             //Error case
+            this->rearSpeed(0);
             break;
+
         case OPEN:
-            //Do Nothing
+            this->rearSpeed(0);
             break;
+
         case CLOSED:
             //Error case
+            this->rearSpeed(0);
             break;
     }
     this->fState = frontState;
     this->rState = rearState;
 }
 
-void Scissors::closeRear(int16_t speed){
-    if(frontState == OPEN){frontState = CLOSING;}
-    switch (frontState){
-        case OPENING:
-            //Error case
-            break;
-        case CLOSING:
-            //Run motors
-            break;
-        case OPEN:
-            //Error case
-            break;
-        case CLOSED:
-            //Do Nothing
-            break;
-    }
-    this->fState = frontState;
-    this->rState = rearState;
-}
-
+//Front open ISR
 void Scissors::scissorFOISR(){
     frontState = OPEN;
     return;
 }
 
-/*
-void Scissors::scissorFCISR(){
-    frontState = CLOSED;
-    return;
-}
-*/
-
+//Rear open ISR
 void Scissors::scissorROISR(){
     rearState = OPEN;
     return;
 }
 
-/*
-void Scissors::scissorRCISR(){
-    rearState = CLOSED;
-    return;
-}
-*/
+//If the closed positions become interrupts, then add FCISR and RCISR
