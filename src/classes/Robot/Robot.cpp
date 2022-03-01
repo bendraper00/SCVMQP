@@ -18,8 +18,8 @@ void Robot::init(){
                                        REAR_DRIVE_SERVO);
     this->frontDrive->init();
     this->rearDrive->init();
-    this->sensors = new Sensors();
-    this->sensors->init();
+    //this->sensors = new Sensors();
+    //this->sensors->init();
     this->scissors = new Scissors();
     this->scissors->init();
     this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);

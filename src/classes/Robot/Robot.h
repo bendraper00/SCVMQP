@@ -14,7 +14,7 @@ class Robot{
         DriveModule* rearDrive;
         Scissors* scissors;
         Encoder* encoders; //This reference is used to construct drive modules
-        Sensors* sensors;
+        //Sensors* sensors;
         PIDController* stagePID;
         void pidSpeed(int16_t speed);
         void stairFollow(uint8_t speed, uint8_t dist);
