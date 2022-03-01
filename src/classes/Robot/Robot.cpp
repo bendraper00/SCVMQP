@@ -30,6 +30,7 @@ void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try 
     this->rearDrive->pidRSpeed(speed);
 }
 
+/*
 void Robot::stairFollow(uint8_t speed, uint8_t dist){
     this->frontDrive->driveSpeed(speed);
 
@@ -48,6 +49,7 @@ void Robot::stairFollow(uint8_t speed, uint8_t dist){
         this->frontDrive->setWheelAngle(angle);
     }
 }
+*/
 
 void Robot::raiseFront(){
     this->scissors->raiseFront(200);

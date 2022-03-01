@@ -17,7 +17,7 @@ class Robot{
         //Sensors* sensors;
         PIDController* stagePID;
         void pidSpeed(int16_t speed);
-        void stairFollow(uint8_t speed, uint8_t dist);
+        //void stairFollow(uint8_t speed, uint8_t dist);
         void raiseFront(); //Raises front stage
         void raiseMid(); //Closes front stage and opens rear state
         void raiseRear(); //Closes rear stage

@@ -23,7 +23,14 @@ void Scissors::init(){
     pinMode(this->rearClosedEs, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(this->frontOpenEs), Scissors::scissorFOISR, FALLING);
     attachInterrupt(digitalPinToInterrupt(this->rearOpenEs), Scissors::scissorROISR, FALLING);
-
+    if(digitalRead(this->frontOpenEs)== HIGH){
+        frontState = CLOSED;
+        this->fState = CLOSED;
+    }
+    if(digitalRead(this->rearOpenEs)== HIGH){
+        rearState = CLOSED;
+        this->rState = CLOSED;
+    }
 }
 
 void Scissors::frontSpeed(int16_t speed){
