@@ -44,6 +44,7 @@ static const int IR_REMOTE_SIGNAL = 47;
 
 //Other Variables
 static const uint8_t MAX_DRIVE_SPEED = 100;
+static const uint8_t DEMO_DRIVE_SPEED = 80;
 static const uint8_t CONTROLLED_DRIVE_SPEED = 100;
 static const uint8_t DRIVE_DIST_TOLERANCE_ENC = 10;
 static const uint8_t OFF_GROUND_BUFFER_MS = 100;

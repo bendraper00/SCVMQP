@@ -21,10 +21,12 @@ class Scissors{
         enum ScissorState{OPENING, CLOSING, OPEN, CLOSED};
         ScissorState fState = OPEN;
         ScissorState rState = OPEN;
-        
-    private:
+
         L298N* frontMotor;
         L298N* rearMotor;
+        
+    private:
+        
         PIDController* speedPID;
         uint8_t frontOpenEs;
         uint8_t frontClosedEs;
