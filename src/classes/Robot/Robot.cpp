@@ -5,7 +5,6 @@ Robot::Robot(){}
 void Robot::init(){
     this->encoders = new Encoder(FRONT_ENCODER_A, FRONT_ENCODER_B, REAR_ENCODER_A, REAR_ENCODER_B);
     this->encoders->init();
-
     this->frontDrive = new DriveModule(FRONT_DRIVE_EN, 
                                        FRONT_DRIVE_IN1, 
                                        FRONT_DRIVE_IN2, 
@@ -17,11 +16,14 @@ void Robot::init(){
                                        this->encoders, 
                                        REAR_DRIVE_SERVO);
     this->frontDrive->init();
+    Serial.println("Front Drive Module Initialized");
     this->rearDrive->init();
-    //this->sensors = new Sensors();
-    //this->sensors->init();
+    Serial.println("Rear Drive Module Initialized");
+    this->sensors = new Sensors();
+    this->sensors->init();
     this->scissors = new Scissors();
     this->scissors->init();
+    Serial.println("Scissor Lifts Initialized");
     this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);
 }
 
@@ -30,26 +32,34 @@ void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try 
     this->rearDrive->pidRSpeed(speed);
 }
 
-/*
-void Robot::stairFollow(uint8_t speed, uint8_t dist){
-    this->frontDrive->driveSpeed(speed);
 
-    if(speed > 0){
+void Robot::stairFollow(int16_t speed, uint8_t dist){
+    /*
+     if(speed > 0){
         int error = dist - sensors->getRangeMagnitude();
         int angle = SERVO_POS_3 + error;
         if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
         this->frontDrive->setWheelAngle(angle);
+        this->rearDrive->setWheelAngle(angle);
     }
-    if(speed < 0){
+    else if(speed < 0){
         int error = sensors->getRangeMagnitude() - dist; //negative error
         int angle = SERVO_POS_3 + error;
         if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
         this->frontDrive->setWheelAngle(angle);
+        this->rearDrive->setWheelAngle(angle);
     }
+    */
+    int16_t diff = sensors->getDifference();
+    int16_t frontEffort = speed + diff;
+    int16_t rearEffort = speed - diff;
+
+    this->frontDrive->pidFSpeed(125);
+    this->rearDrive->pidRSpeed(125);
 }
-*/
+
 
 void Robot::raiseFront(){
     this->scissors->raiseFront(200);

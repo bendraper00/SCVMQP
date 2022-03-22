@@ -31,6 +31,7 @@ class DriveModule{
       uint8_t servoPin;
       int32_t targetCounts;
       enum State{DRIVING, WAITING};
-      PIDController* speedPID;
+      PIDController* frontPID;
+      PIDController* rearPID;
 };
 #endif

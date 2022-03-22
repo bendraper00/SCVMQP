@@ -1,7 +1,8 @@
 #include "DriveModule.h"
 #include <Arduino.h>
 
-volatile uint8_t readyToPID = 0;
+volatile uint8_t readyToRPID = 0;
+volatile uint8_t readyToFPID = 0;
 Encoder* encP;
 volatile int32_t frontSpeedCounts = 0;
 volatile int32_t rearSpeedCounts = 0;
@@ -16,7 +17,8 @@ DriveModule::DriveModule(const uint8_t EN,
   this->motor = new L298N(EN, IN1, IN2);
   this->enc = enc;
   this->servoPin = servoPin;
-  this->speedPID = new PIDController(PID_SPEED_KP, PID_SPEED_KI, PID_SPEED_KD);
+  this->frontPID = new PIDController(PID_SPEED_KP, PID_SPEED_KI, PID_SPEED_KD);
+  this->rearPID = new PIDController(PID_SPEED_KP, PID_SPEED_KI, PID_SPEED_KD);
 }
 
 void DriveModule::init(){
@@ -58,9 +60,9 @@ void DriveModule::pidRSpeed(int16_t target){
    else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
      offGround = false;
    }
-  else if(readyToPID){
-    readyToPID = 0;
-    int effort = this->speedPID->calcPIDSpeed(target, rearSpeedCounts, MAX_DRIVE_SPEED);
+  else if(readyToRPID){
+    readyToRPID = 0;
+    int effort = this->rearPID->calcPIDSpeed(target, rearSpeedCounts, MAX_DRIVE_SPEED);
     this->driveSpeed(effort);
   }
 }
@@ -72,9 +74,10 @@ void DriveModule::pidFSpeed(int16_t target){
    else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
      offGround = false;
    }
-  else if(readyToPID){
-    readyToPID = 0;
-    int effort = this->speedPID->calcPIDSpeed(target, frontSpeedCounts, MAX_DRIVE_SPEED);
+  else if(readyToFPID){
+    readyToFPID = 0;
+    int effort = this->frontPID->calcPIDSpeed(target, frontSpeedCounts, MAX_DRIVE_SPEED);
+    Serial.println(effort);
     this->driveSpeed(effort);
   }
 }
@@ -147,7 +150,8 @@ ISR(TIMER3_COMPA_vect)
   encP->updateCounts();
   frontSpeedCounts = encP->getFrontCounts();
   rearSpeedCounts = encP->getRearCounts();
-  readyToPID = 1;
+  readyToRPID = 1;
+  readyToFPID = 1;
 }
 
 void DriveModule::ButtonISR(){
