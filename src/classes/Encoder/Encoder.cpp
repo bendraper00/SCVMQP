@@ -3,8 +3,8 @@ uint8_t statPinFA;
 uint8_t statPinFB;
 uint8_t statPinRA;
 uint8_t statPinRB;
-volatile uint32_t statFrontCounts = 0;
-volatile uint32_t statRearCounts = 0;
+volatile int32_t statFrontCounts = 0;
+volatile int32_t statRearCounts = 0;
 
 Encoder::Encoder(uint8_t pinFA, uint8_t pinFB, uint8_t pinRA, uint8_t pinRB){
     this->pinFA = pinFA;
@@ -25,10 +25,10 @@ void Encoder:: init(){
     attachInterrupt(digitalPinToInterrupt(this->pinFA), Encoder::encoderFISR, RISING);
     attachInterrupt(digitalPinToInterrupt(this->pinRA), Encoder::encoderRISR, RISING);
 }
-int16_t Encoder::getFrontCounts(){
+int32_t Encoder::getFrontCounts(){
     return this->frontCounts;
 }
-int16_t Encoder::getRearCounts(){
+int32_t Encoder::getRearCounts(){
     return this->rearCounts;
 }
 void Encoder::updateCounts(){
@@ -48,7 +48,7 @@ int16_t Encoder::distToCounts(float dist){
 
 void Encoder::encoderFISR(){
     //turn off interrupts... I think
-    if(!digitalRead(statPinFB)){
+    if(digitalRead(statPinFB)){
         statFrontCounts++;
     }
     else{
@@ -57,7 +57,7 @@ void Encoder::encoderFISR(){
 }
 void Encoder::encoderRISR(){
     //turn off interrupts... I think
-    if(!digitalRead(statPinRB)){
+    if(digitalRead(statPinRB)){
         statRearCounts++;
     }
     else{

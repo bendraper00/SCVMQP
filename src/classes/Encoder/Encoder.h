@@ -7,8 +7,8 @@ class Encoder{
     public:
         Encoder(uint8_t pinFA, uint8_t pinFB, uint8_t pinRA, uint8_t pinRB);
         void init();
-        int16_t getFrontCounts();
-        int16_t getRearCounts();
+        int32_t getFrontCounts();
+        int32_t getRearCounts();
         void updateCounts();
         float calcDist(int16_t start, int16_t end);
         static void encoderFISR();

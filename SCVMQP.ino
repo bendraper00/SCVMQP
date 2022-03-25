@@ -22,4 +22,6 @@ void setup()
 void loop()
 {
   bot.stairFollow(125, 80);
+  //bot.frontDrive->pidFSpeed(125);
+  //bot.rearDrive->pidRSpeed(125);
 }

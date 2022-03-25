@@ -8,20 +8,22 @@ PIDController::PIDController(float p, float i, float d){
   this->kd = d;
 }
 
-int PIDController::calcPIDSpeed(int16_t target, int16_t curr, int16_t cap){
-  noInterrupts();
-  int16_t actual = curr - this->prev;
-  //Serial.println(actual);
+int PIDController::calcPIDSpeed(int32_t target, int32_t curr, int32_t cap){
+  float actual = 0;
+  if(curr > 0 && this->prev < 0) {actual = target;} //A hack to solve issue with variable rollover
+  else if(curr < 0 && this->prev > 0) {actual = target;}
+  else{actual = curr - this->prev;}
+  //Serial.println(curr);
   this->prev = curr;
-  interrupts();
-
-  int16_t error = target - actual;
+  float error = target - actual;
   this->errorSum += error;
-  int32_t output = kp*error + ki*this->errorSum;
+  float dError = (error - this->prevError)/(millis()-prevTime);
+  this->prevError = error;
+  this->prevTime = millis();
+  
+  int32_t output = kp*error + kd*dError + ki*this->errorSum;
   
   if(output > cap){output = cap;}
-
   if(output < -1*cap){output = -1*cap;}
-  
   return output;
 }

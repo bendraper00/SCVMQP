@@ -10,7 +10,7 @@ NOTES:
 
 //Pins Assignments
 static const uint8_t FRONT_ENCODER_A = 18; //INTERRUPT
-static const uint8_t FRONT_ENCODER_B = 34; //DIGITAL
+static const uint8_t FRONT_ENCODER_B = 36; //DIGITAL
 static const uint8_t FRONT_DRIVE_EN = 10; //PWM
 static const uint8_t FRONT_DRIVE_IN1 = 26; //DIGITAL
 static const uint8_t FRONT_DRIVE_IN2 = 28; //DIGITAL
@@ -18,7 +18,7 @@ static const uint8_t FRONT_DRIVE_SERVO = 8; //PWM
 static const uint8_t FRONT_DRIVE_BUTTON = 44; //DIGITAL
 
 static const uint8_t REAR_ENCODER_A = 19; //INTERRUPT
-static const uint8_t REAR_ENCODER_B = 35; //DIGITAL
+static const uint8_t REAR_ENCODER_B = 37; //DIGITAL
 static const uint8_t REAR_DRIVE_EN = 6; //PWM
 static const uint8_t REAR_DRIVE_IN1 = 25; //DIGITAL
 static const uint8_t REAR_DRIVE_IN2 = 23; //DIGITAL
@@ -56,8 +56,8 @@ static const uint8_t SERVO_POS_4 = 120;
 
 //PID VALUES
 static const float PID_SPEED_KP = 1.0;
-static const float PID_SPEED_KI = 1.0;
-static const float PID_SPEED_KD = 0.0;
+static const float PID_SPEED_KI = 0.2;
+static const float PID_SPEED_KD = 10.0;
 
 static const float PID_DIST_KP = 2.0;
 static const float PID_DIST_KI = 0.0;

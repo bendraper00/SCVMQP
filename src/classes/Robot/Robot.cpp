@@ -34,9 +34,9 @@ void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try 
 
 
 void Robot::stairFollow(int16_t speed, uint8_t dist){
-    /*
+    
      if(speed > 0){
-        int error = dist - sensors->getRangeMagnitude();
+        int error = sensors->getRangeMagnitude() - dist;
         int angle = SERVO_POS_3 + error;
         if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
@@ -44,20 +44,25 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
         this->rearDrive->setWheelAngle(angle);
     }
     else if(speed < 0){
-        int error = sensors->getRangeMagnitude() - dist; //negative error
+        int error = dist - sensors->getRangeMagnitude(); //negative error
         int angle = SERVO_POS_3 + error;
         if(angle > SERVO_POS_4){angle = SERVO_POS_4;}
         if(angle < SERVO_POS_2){angle = SERVO_POS_2;}
         this->frontDrive->setWheelAngle(angle);
         this->rearDrive->setWheelAngle(angle);
     }
-    */
+    
+
     int16_t diff = sensors->getDifference();
     int16_t frontEffort = speed + diff;
     int16_t rearEffort = speed - diff;
-
-    this->frontDrive->pidFSpeed(125);
-    this->rearDrive->pidRSpeed(125);
+    Serial.print(frontEffort);
+    Serial.print("\t\t");
+    Serial.print(rearEffort);
+    Serial.println();
+    
+    this->frontDrive->pidFSpeed(frontEffort);
+    this->rearDrive->pidRSpeed(rearEffort);
 }
 
 

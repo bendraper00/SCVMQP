@@ -9,10 +9,12 @@ class PIDController{
         float kp;
         float ki;
         float kd;
-        int32_t prev = 0;
-        int32_t errorSum = 0;
+        float prev = 0;
+        uint32_t prevTime = 0;
+        float prevError = 0;
+        float errorSum = 0;
 
-        int calcPIDSpeed(int16_t target, int16_t curr, int16_t cap);
+        int calcPIDSpeed(int32_t target, int32_t curr, int32_t cap);
     private:
 };
 #endif
