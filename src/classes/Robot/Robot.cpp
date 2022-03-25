@@ -71,15 +71,17 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
 bool Robot::raiseFront(int16_t speed){
     switch(botState){
         case IDLE:
-            this->botState = RAISING;
+            this->botState = RAISINGFRONT;
             break;
 
-        case RAISING:
-            if(this->scissors->fState == Scissors::CLOSED){botState = LOWERING;}
+        case RAISINGFRONT:
+            if(this->scissors->fState == Scissors::CLOSED){botState = LOWERINGFRONT;}
             this->scissors->raiseFront(speed);
             break;
 
-        case LOWERING:
+        //ADD CASE FOR MOVING FORWARD x MM AWAY FROM STEP
+
+        case LOWERINGFRONT:
             if(digitalRead(FRONT_WHEEL_SWITCH)){
                 this->scissors->frontSpeed(0);
                 botState = IDLE;
@@ -92,8 +94,35 @@ bool Robot::raiseFront(int16_t speed){
     return false;
 }
 
-bool Robot::raiseMid(){
+bool Robot::raiseMid(int16_t speed){
     //Use a gyro axis to keep stage level, speeding up stages to compensate
+    //Only run when rear is open and front is closed or opening
+    float angle;
+    switch(botState){
+        case IDLE:
+            if(this->scissors->fState == Scissors::OPENING){botState = RAISINGMID;}
+            break;
+
+        case RAISINGMID:
+            this->sensors->getPitch(angle);
+            int effort = this->stagePID->calcPIDSpeed(0, angle, MAX_DRIVE_SPEED);
+            if(effort>=0){
+                this->scissors->lowerFront(speed);
+                this->scissors->raiseRear(speed-abs(effort));
+            }
+            else{
+                this->scissors->lowerFront(speed-abs(effort));
+                this->scissors->raiseRear(speed);
+            }
+            if(this->scissors->fState == Scissors::OPEN){
+                this->scissors->frontSpeed(0);
+                this->scissors->rearSpeed(0);
+                botState = IDLE;
+                return true;
+            }
+            break;
+    }
+    return false;
 }
 
 bool Robot::raiseRear(){

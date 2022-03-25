@@ -66,7 +66,7 @@ static const float PID_DIST_KI = 0.0;
 static const float PID_DIST_KD = 0.0;
 
 static const float PID_SCISSOR_KP = 1.0;
-static const float PID_SCISSOR_KI = 1.0;
+static const float PID_SCISSOR_KI = 0.0;
 static const float PID_SCISSOR_KD = 0.0;
 
 static const int LOX1_ADDRESS = 0x30;

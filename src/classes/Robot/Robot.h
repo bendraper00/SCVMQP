@@ -19,9 +19,9 @@ class Robot{
         void pidSpeed(int16_t speed);
         void stairFollow(int16_t speed, uint8_t dist);
         bool raiseFront(int16_t speed); //Raises front stage
-        bool raiseMid(); //Closes front stage and opens rear state
+        bool raiseMid(int16_t speed); //Closes front stage and opens rear state
         bool raiseRear(); //Closes rear stage
-        enum RobotState{RAISING, LOWERING, IDLE};
+        enum RobotState{RAISINGFRONT, LOWERINGFRONT, RAISINGMID, IDLE};
         RobotState botState = IDLE;
         
     private:
