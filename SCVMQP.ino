@@ -8,6 +8,7 @@
 //Objects
 Robot bot;
 IRrecv ir(IR_REMOTE_SIGNAL);
+int tempState = 0;
 
 void setup()
 {
@@ -17,10 +18,21 @@ void setup()
   ir.enableIRIn();
   bot.frontDrive->setWheelAngle(90);
   bot.rearDrive->setWheelAngle(90);
+  delay(5000);
 }
 
 void loop()
 {
-  float angle;
-  bot.sensors->getPitch(angle);
+  //bot.scissors->lowerFront(200);
+  
+  switch(tempState){
+    case 0:
+      if(bot.raiseFront(200)){
+        tempState = 1;
+      }
+      break;
+    case 1:
+      break;
+  }
+
 }

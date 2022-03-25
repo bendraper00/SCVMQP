@@ -37,6 +37,8 @@ static const uint8_t REAR_SCISSOR_EN = 7; //PWM
 static const uint8_t REAR_SCISSOR_IN1 = 27; //DIGITAL
 static const uint8_t REAR_SCISSOR_IN2 = 29; //DIGITAL
 
+static const uint8_t FRONT_WHEEL_SWITCH = 44;
+static const uint8_t REAR_WHEEL_SWITCH = 45;
 
 static const int IR_REMOTE_SIGNAL = 47;
 

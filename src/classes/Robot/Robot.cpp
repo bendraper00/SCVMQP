@@ -25,13 +25,15 @@ void Robot::init(){
     this->scissors->init();
     Serial.println("Scissor Lifts Initialized");
     this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);
+
+    pinMode(FRONT_WHEEL_SWITCH, INPUT_PULLUP);
+    pinMode(REAR_WHEEL_SWITCH, INPUT_PULLUP);
 }
 
 void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try to maintain equal counts rather than speeds. Will determine in testing
     this->frontDrive->pidFSpeed(speed);
     this->rearDrive->pidRSpeed(speed);
 }
-
 
 void Robot::stairFollow(int16_t speed, uint8_t dist){
     int magnitude;
@@ -66,13 +68,34 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
     this->rearDrive->pidRSpeed(rearEffort);
 }
 
+bool Robot::raiseFront(int16_t speed){
+    switch(botState){
+        case IDLE:
+            this->botState = RAISING;
+            break;
 
-void Robot::raiseFront(){
-    this->scissors->raiseFront(200);
+        case RAISING:
+            if(this->scissors->fState == Scissors::CLOSED){botState = LOWERING;}
+            this->scissors->raiseFront(speed);
+            break;
+
+        case LOWERING:
+            if(digitalRead(FRONT_WHEEL_SWITCH)){
+                this->scissors->frontSpeed(0);
+                botState = IDLE;
+                return true;
+            }
+            this->scissors->lowerFront(speed);
+            break;
+
+    }
+    return false;
 }
-void Robot::raiseMid(){
+
+bool Robot::raiseMid(){
     //Use a gyro axis to keep stage level, speeding up stages to compensate
 }
-void Robot::raiseRear(){
+
+bool Robot::raiseRear(){
     this->scissors->raiseRear(200);
 }

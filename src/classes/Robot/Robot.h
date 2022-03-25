@@ -18,9 +18,11 @@ class Robot{
         PIDController* stagePID;
         void pidSpeed(int16_t speed);
         void stairFollow(int16_t speed, uint8_t dist);
-        void raiseFront(); //Raises front stage
-        void raiseMid(); //Closes front stage and opens rear state
-        void raiseRear(); //Closes rear stage
+        bool raiseFront(int16_t speed); //Raises front stage
+        bool raiseMid(); //Closes front stage and opens rear state
+        bool raiseRear(); //Closes rear stage
+        enum RobotState{RAISING, LOWERING, IDLE};
+        RobotState botState = IDLE;
         
     private:
 };
