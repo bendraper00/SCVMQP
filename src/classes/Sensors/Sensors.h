@@ -15,7 +15,8 @@ class Sensors{
         uint8_t sensor_status[TOF_SENSOR_COUNT];
         uint16_t getRangeMagnitude();
         int16_t getDifference();
-        int16_t getPitch(float& observedAngle);
+        void getRangeData(int& mag, int& diff);
+        void getPitch(float& observedAngle);
         uint8_t ranges[TOF_SENSOR_COUNT];
 
     private:
