@@ -103,11 +103,11 @@ int16_t Sensors::getDifference(){
 
 void Sensors::getRangeData(int& mag, int& diff){
     static uint8_t range;
-    static uint8_t _magnitudeState = 0; //0 - waiting on sensor 1 data, 1 = waiting on sensor 2 data then update magnitude
-    static uint16_t magnitude = 0;
-    static uint16_t difference = 0;
-    static uint16_t tempMag = 0;
-    static uint16_t tempDif = 0;
+    static int16_t _magnitudeState = 0; //0 - waiting on sensor 1 data, 1 = waiting on sensor 2 data then update magnitude
+    static int16_t magnitude = 0;
+    static int16_t difference = 0;
+    static int16_t tempMag = 0;
+    static int16_t tempDif = 0;
 
     switch(_magnitudeState){
         case 0:
@@ -136,17 +136,31 @@ void Sensors::getRangeData(int& mag, int& diff){
 void Sensors::getPitch(float& observedAngle){
     this->gyro.read();
     uint32_t t = millis();
-    float vel = (((int)this->gyro.g.y)*8.75)/1000.0;
+    double vel = (((int)this->gyro.g.y - this->bias)*8.75)/1000.0;
     static uint32_t prevTime = 0;
-    static float prevVel = 0.0;
-    static double angle = 0.0;
+    static double prevVel = 0.0;
     uint32_t dTime = t-prevTime;
-    angle = angle + ((vel-1.5)/(dTime/1000.0))*(27.0/484000.0);
-    observedAngle = angle;
+    this->angle = this->angle + (vel/(dTime/1000.0))*(27.0/484000.0);
+    observedAngle = this->angle;
     prevTime = t;
     prevVel = vel;
     return;
 }
 
+void Sensors::gyroCalibrate(){
+    this->angle = 0.0;
+    Serial.println("GYRO CALIBRATING, DO NOT TOUCH THE ROBOT");
+    uint32_t startTime = millis();
+    int readings = 0;
+    int64_t readingSum = 0;
+    while(millis()-startTime <= 5000){
+        this->gyro.read();
+        readingSum += (int)this->gyro.g.y;
+        readings++;
+    }
+    this->bias = (readingSum/readings);
+    Serial.print("CALIBRATION COMPLETE\nBIAS = ");
+    Serial.println(this->bias);
+}
 
 

@@ -12,27 +12,37 @@ int tempState = 0;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("---Initializing Systems---");
   bot.init();
   ir.enableIRIn();
   bot.frontDrive->setWheelAngle(90);
   bot.rearDrive->setWheelAngle(90);
-  delay(5000);
+  delay(2000);
+  bot.sensors->gyroCalibrate();
 }
 
 void loop()
 {
-  //bot.scissors->lowerFront(200);
-  
   switch(tempState){
     case 0:
-      if(bot.raiseFront(200)){
-        tempState = 1;
-      }
+      if(!digitalRead(BUMP_RIGHT)){tempState = 1;}
+      bot.stairFollow(100, 80);
       break;
+    
     case 1:
+    if(!digitalRead(BUMP_LEFT)){tempState = 0;}
+      bot.stairFollow(-100, 80);
       break;
   }
+  
+
+  /*
+  //DISCUSS AT MEETING
+  float angle;
+  bot.sensors->getPitch(angle);
+  Serial.println(angle);
+  */
 
 }
+

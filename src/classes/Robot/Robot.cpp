@@ -28,6 +28,9 @@ void Robot::init(){
 
     pinMode(FRONT_WHEEL_SWITCH, INPUT_PULLUP);
     pinMode(REAR_WHEEL_SWITCH, INPUT_PULLUP);
+    pinMode(BUMP_LEFT, INPUT_PULLUP);
+    pinMode(BUMP_RIGHT, INPUT_PULLUP);
+
 }
 
 void Robot::pidSpeed(int16_t speed){ //This may be better if the two wheels try to maintain equal counts rather than speeds. Will determine in testing
@@ -39,7 +42,6 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
     int magnitude;
     int difference;
     sensors->getRangeData(magnitude, difference);
-
      if(speed > 0){
         int error = magnitude - dist;
         int angle = SERVO_POS_3 + error;
@@ -59,10 +61,6 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
     
     int16_t frontEffort = speed + difference;
     int16_t rearEffort = speed - difference;
-    Serial.print(frontEffort);
-    Serial.print("\t\t");
-    Serial.print(rearEffort);
-    Serial.println();
     
     this->frontDrive->pidFSpeed(frontEffort);
     this->rearDrive->pidRSpeed(rearEffort);
@@ -105,14 +103,14 @@ bool Robot::raiseMid(int16_t speed){
 
         case RAISINGMID:
             this->sensors->getPitch(angle);
-            int effort = this->stagePID->calcPIDSpeed(0, angle, MAX_DRIVE_SPEED);
+            int effort = this->stagePID->calcPID(0.0, angle, MAX_DRIVE_SPEED);
             if(effort>=0){
                 this->scissors->lowerFront(speed);
-                this->scissors->raiseRear(speed-abs(effort));
+                this->scissors->lowerRear(speed-abs(effort));
             }
             else{
                 this->scissors->lowerFront(speed-abs(effort));
-                this->scissors->raiseRear(speed);
+                this->scissors->lowerRear(speed);
             }
             if(this->scissors->fState == Scissors::OPEN){
                 this->scissors->frontSpeed(0);

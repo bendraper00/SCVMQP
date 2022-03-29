@@ -77,7 +77,6 @@ void DriveModule::pidFSpeed(int16_t target){
   else if(readyToFPID){
     readyToFPID = 0;
     int effort = this->frontPID->calcPIDSpeed(target, frontSpeedCounts, MAX_DRIVE_SPEED);
-    Serial.println(frontSpeedCounts);
     this->driveSpeed(effort);
   }
 }

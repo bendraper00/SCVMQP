@@ -147,6 +147,7 @@ void Scissors::lowerRear(int16_t speed){
     this->rState = rearState;
 }
 
+//INCORRECT USE OF OPEN AND CLOSE
 void Scissors::raiseRear(int16_t speed){
     if(rearState == CLOSED || rearState == CLOSING){rearState = OPENING;}
     switch (rearState){

@@ -39,6 +39,8 @@ static const uint8_t REAR_SCISSOR_IN2 = 29; //DIGITAL
 
 static const uint8_t FRONT_WHEEL_SWITCH = 44;
 static const uint8_t REAR_WHEEL_SWITCH = 45;
+static const uint8_t BUMP_LEFT = 38;
+static const uint8_t BUMP_RIGHT = 39;
 
 static const int IR_REMOTE_SIGNAL = 47;
 
@@ -66,7 +68,7 @@ static const float PID_DIST_KI = 0.0;
 static const float PID_DIST_KD = 0.0;
 
 static const float PID_SCISSOR_KP = 1.0;
-static const float PID_SCISSOR_KI = 0.0;
+static const float PID_SCISSOR_KI = 0.01;
 static const float PID_SCISSOR_KD = 0.0;
 
 static const int LOX1_ADDRESS = 0x30;

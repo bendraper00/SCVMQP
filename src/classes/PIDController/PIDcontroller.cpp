@@ -13,7 +13,6 @@ int PIDController::calcPIDSpeed(int32_t target, int32_t curr, int32_t cap){
   if(curr > 0 && this->prev < 0) {actual = target;} //A hack to solve issue with variable rollover
   else if(curr < 0 && this->prev > 0) {actual = target;}
   else{actual = curr - this->prev;}
-  //Serial.println(curr);
   this->prev = curr;
   float error = target - actual;
   this->errorSum += error;
@@ -21,8 +20,29 @@ int PIDController::calcPIDSpeed(int32_t target, int32_t curr, int32_t cap){
   this->prevError = error;
   this->prevTime = millis();
   
+  // Serial.print("Error: ");
+  // Serial.print(error);
+  // Serial.print("\t\tErrorSum: ");
+  // Serial.print(this->errorSum);
+  // Serial.print("\t\tdError: ");
+  // Serial.println(dError);
+
   int32_t output = kp*error + kd*dError + ki*this->errorSum;
   
+  if(output > cap){output = cap;}
+  if(output < -1*cap){output = -1*cap;}
+  return output;
+}
+
+int PIDController::calcPID(float target, float curr, int32_t cap){
+  float error = target - curr;
+  this->errorSum += error;
+  float dError = (error - this->prevError)/(millis()-prevTime);
+  this->prevError = error;
+  this->prevTime = millis();
+
+  int output = kp*error + kd*dError + ki*this->errorSum;
+
   if(output > cap){output = cap;}
   if(output < -1*cap){output = -1*cap;}
   return output;
