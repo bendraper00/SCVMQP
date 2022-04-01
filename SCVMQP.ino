@@ -9,6 +9,8 @@
 Robot bot;
 IRrecv ir(IR_REMOTE_SIGNAL);
 int tempState = 0;
+int nextState;
+unsigned long t = 0;
 
 void setup()
 {
@@ -18,31 +20,52 @@ void setup()
   ir.enableIRIn();
   bot.frontDrive->setWheelAngle(90);
   bot.rearDrive->setWheelAngle(90);
-  delay(2000);
-  bot.sensors->gyroCalibrate();
 }
 
 void loop()
 {
+  // switch(tempState){
+  //   case 0:
+  //     if(!digitalRead(BUMP_RIGHT)){tempState = 1;}
+  //     bot.stairFollow(100, 80);
+  //     break;
+    
+  //   case 1:
+  //   if(!digitalRead(BUMP_LEFT)){tempState = 0;}
+  //     bot.stairFollow(-100, 80);
+  //     break;
+  // }
+
+  
   switch(tempState){
     case 0:
-      if(!digitalRead(BUMP_RIGHT)){tempState = 1;}
-      bot.stairFollow(100, 80);
+      if(bot.home()){
+        tempState = 1;
+        nextState = 2;
+        t = millis();
+        bot.sensors->gyroCalibrate();
+      }
       break;
     
     case 1:
-    if(!digitalRead(BUMP_LEFT)){tempState = 0;}
-      bot.stairFollow(-100, 80);
+      if(millis() - t >= 3000){
+        tempState = nextState;
+      }
+      break;
+    
+    case 2:
+      if(bot.raiseFront(MAX_DRIVE_SPEED)){
+        tempState = 1;
+        nextState = 3;
+        t = millis();
+
+      }
+      break;
+    case 3:
+      bot.raiseMid(MAX_DRIVE_SPEED);
       break;
   }
-  
 
-  /*
-  //DISCUSS AT MEETING
-  float angle;
-  bot.sensors->getPitch(angle);
-  Serial.println(angle);
-  */
 
 }
 

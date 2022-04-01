@@ -16,6 +16,8 @@ class Robot{
         Encoder* encoders; //This reference is used to construct drive modules
         Sensors* sensors;
         PIDController* stagePID;
+
+        bool home();
         void pidSpeed(int16_t speed);
         void stairFollow(int16_t speed, uint8_t dist);
         bool raiseFront(int16_t speed); //Raises front stage

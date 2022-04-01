@@ -2,7 +2,7 @@
 #define SENSORS_H_
 #include <arduino.h>
 #include <Adafruit_VL6180X.h> //Time of Flight sensor
-#include <L3G.h>
+#include "MPU6050.h"
 #include <Wire.h>
 #include "../../../config.h"
 
@@ -19,14 +19,13 @@ class Sensors{
         void getPitch(float& observedAngle);
         uint8_t ranges[TOF_SENSOR_COUNT];
         void gyroCalibrate(); //Maybe add dynamic bias calibration later
-        L3G gyro;
+        MPU6050 mpu;
 
     private:
         Adafruit_VL6180X sensA;
         Adafruit_VL6180X sensB;
         Adafruit_VL6180X* sens[TOF_SENSOR_COUNT];
-        double angle = 0.0;
-        double bias = 0.0;
+        float pitch = 0.0;
 };
 
 #endif

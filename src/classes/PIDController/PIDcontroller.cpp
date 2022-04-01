@@ -20,6 +20,7 @@ int PIDController::calcPIDSpeed(int32_t target, int32_t curr, int32_t cap){
   this->prevError = error;
   this->prevTime = millis();
   
+
   // Serial.print("Error: ");
   // Serial.print(error);
   // Serial.print("\t\tErrorSum: ");
@@ -29,6 +30,10 @@ int PIDController::calcPIDSpeed(int32_t target, int32_t curr, int32_t cap){
 
   int32_t output = kp*error + kd*dError + ki*this->errorSum;
   
+  Serial.print(actual);
+  Serial.print(",");
+  Serial.println(output);
+
   if(output > cap){output = cap;}
   if(output < -1*cap){output = -1*cap;}
   return output;

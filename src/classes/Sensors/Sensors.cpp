@@ -42,12 +42,13 @@ void Sensors::init(){
     this->sensB.setAddress(LOX2_ADDRESS);
     Serial.println("Right ToF sensor initialized");
 
-    //Boot gyro
-    if (!this->gyro.init()){
-        Serial.println("Failed to autodetect gyro type!");
+    //Boot MPU
+    while(!this->mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G)){
+        Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
+        delay(500);
     }
-    Serial.println("Gyro initialized");
-    this->gyro.enableDefault();
+    this->mpu.calibrateGyro();
+    this->mpu.setThreshold(3);
 
 }
 
@@ -134,33 +135,24 @@ void Sensors::getRangeData(int& mag, int& diff){
 }
 
 void Sensors::getPitch(float& observedAngle){
-    this->gyro.read();
-    uint32_t t = millis();
-    double vel = (((int)this->gyro.g.y - this->bias)*8.75)/1000.0;
-    static uint32_t prevTime = 0;
-    static double prevVel = 0.0;
-    uint32_t dTime = t-prevTime;
-    this->angle = this->angle + (vel/(dTime/1000.0))*(27.0/484000.0);
-    observedAngle = this->angle;
-    prevTime = t;
-    prevVel = vel;
-    return;
+    static unsigned long dt = 0;
+    if(millis()-dt >= MPU_TIMESTEP){
+        static float pitchG = 0;
+        static float pitchA = 0;
+        // Read normalized values
+        Vector normG = mpu.readNormalizeGyro();
+        Vector normAccel = mpu.readNormalizeAccel();
+        // Calculate Pitch and Roll
+        pitchG = pitchG + normG.YAxis * (MPU_TIMESTEP/1000.0);
+        pitchA = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis*normAccel.YAxis + normAccel.ZAxis*normAccel.ZAxis))*180.0)/PI;
+        this->pitch = GYRO_WEIGHT * pitchG + ACCEL_WEIGHT * pitchA;
+        observedAngle = this->pitch;
+        dt = millis();
+    }
 }
 
 void Sensors::gyroCalibrate(){
-    this->angle = 0.0;
-    Serial.println("GYRO CALIBRATING, DO NOT TOUCH THE ROBOT");
-    uint32_t startTime = millis();
-    int readings = 0;
-    int64_t readingSum = 0;
-    while(millis()-startTime <= 5000){
-        this->gyro.read();
-        readingSum += (int)this->gyro.g.y;
-        readings++;
-    }
-    this->bias = (readingSum/readings);
-    Serial.print("CALIBRATION COMPLETE\nBIAS = ");
-    Serial.println(this->bias);
+    this->mpu.calibrateGyro();
 }
 
 

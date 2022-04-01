@@ -66,6 +66,17 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
     this->rearDrive->pidRSpeed(rearEffort);
 }
 
+bool Robot::home(){
+    if(!digitalRead(FRONT_OPEN_ENDSTOP) && !digitalRead(REAR_OPEN_ENDSTOP)){
+        return true;
+    }
+    else{
+        this->scissors->lowerFront(MAX_DRIVE_SPEED);
+        this->scissors->raiseRear(MAX_DRIVE_SPEED);
+        return false;
+    }
+}
+
 bool Robot::raiseFront(int16_t speed){
     switch(botState){
         case IDLE:
@@ -104,7 +115,7 @@ bool Robot::raiseMid(int16_t speed){
         case RAISINGMID:
             this->sensors->getPitch(angle);
             int effort = this->stagePID->calcPID(0.0, angle, MAX_DRIVE_SPEED);
-            if(effort>=0){
+            if(effort<=0){
                 this->scissors->lowerFront(speed);
                 this->scissors->lowerRear(speed-abs(effort));
             }
@@ -118,8 +129,13 @@ bool Robot::raiseMid(int16_t speed){
                 botState = IDLE;
                 return true;
             }
+            Serial.print("ANGLE: ");
+            Serial.print(angle);
+            Serial.print("\t\tEffort:");
+            Serial.println(effort);
             break;
     }
+
     return false;
 }
 

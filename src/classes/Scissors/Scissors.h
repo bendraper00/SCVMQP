@@ -19,8 +19,8 @@ class Scissors{
         void rearSpeed(int16_t speed);
 
         enum ScissorState{OPENING, CLOSING, OPEN, CLOSED};
-        ScissorState fState = OPEN;
-        ScissorState rState = OPEN;
+        ScissorState fState = OPENING;
+        ScissorState rState = OPENING;
 
         L298N* frontMotor;
         L298N* rearMotor;

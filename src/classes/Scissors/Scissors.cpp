@@ -12,8 +12,8 @@ Scissors::Scissors(){
     this->rearOpenEs = REAR_OPEN_ENDSTOP;
     this->rearClosedEs = REAR_CLOSED_ENDSTOP;
 
-    frontState = OPEN;
-    rearState = OPEN;
+    frontState = OPENING;
+    rearState = OPENING;
 }
 
 void Scissors::init(){
