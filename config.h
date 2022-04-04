@@ -67,9 +67,9 @@ static const float PID_DIST_KP = 2.0;
 static const float PID_DIST_KI = 0.0;
 static const float PID_DIST_KD = 0.0;
 
-static const float PID_SCISSOR_KP = 4.0;
-static const float PID_SCISSOR_KI = 0.05;
-static const float PID_SCISSOR_KD = 0.0;
+static const float PID_SCISSOR_KP = 50.0;
+static const float PID_SCISSOR_KI = 0.1;
+static const float PID_SCISSOR_KD = 5.0;
 
 static const int LOX1_ADDRESS = 0x30;
 static const int LOX2_ADDRESS = 0x31;
@@ -78,8 +78,8 @@ static const int LOX2_SHT = 33;
 static const int TOF_SENSOR_COUNT = 2;
 static const int TOF_PERIOD = 10;
 
-static const float GYRO_WEIGHT = 0.96;
-static const float ACCEL_WEIGHT = 0.04;
+static const float GYRO_WEIGHT = 0.95;
+static const float ACCEL_WEIGHT = 0.05;
 static const float MPU_TIMESTEP = 10.0;
 
 

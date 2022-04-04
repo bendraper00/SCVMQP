@@ -18,12 +18,13 @@ void setup()
   Serial.println("---Initializing Systems---");
   bot.init();
   ir.enableIRIn();
-  bot.frontDrive->setWheelAngle(90);
-  bot.rearDrive->setWheelAngle(90);
+  bot.frontDrive->setWheelAngle(0);
+  bot.rearDrive->setWheelAngle(0);
 }
 
 void loop()
 {
+  //-------------STAIR SWEEPING----------------
   // switch(tempState){
   //   case 0:
   //     if(!digitalRead(BUMP_RIGHT)){tempState = 1;}
@@ -37,12 +38,14 @@ void loop()
   // }
 
   
+  //------------RAISE MID TEST----------------
   switch(tempState){
     case 0:
       if(bot.home()){
         tempState = 1;
         nextState = 2;
         t = millis();
+        Serial.println("CALIBRATING");
         bot.sensors->gyroCalibrate();
       }
       break;
@@ -62,10 +65,17 @@ void loop()
       }
       break;
     case 3:
-      bot.raiseMid(MAX_DRIVE_SPEED);
+      if(bot.raiseMid(MAX_DRIVE_SPEED)){
+        tempState = 4;
+      }
+      break;
+    case 4:
       break;
   }
 
-
+  //---------------IMU TEST----------------------
+  // float angle;
+  // angle = bot.sensors->getPitch();
+  // Serial.println(angle);
 }
 

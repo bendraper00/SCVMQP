@@ -47,7 +47,7 @@ void Sensors::init(){
         Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
         delay(500);
     }
-    this->mpu.calibrateGyro();
+    //this->mpu.calibrateGyro();
     this->mpu.setThreshold(3);
 
 }
@@ -134,21 +134,27 @@ void Sensors::getRangeData(int& mag, int& diff){
     diff = difference;
 }
 
-void Sensors::getPitch(float& observedAngle){
-    static unsigned long dt = 0;
-    if(millis()-dt >= MPU_TIMESTEP){
-        static float pitchG = 0;
-        static float pitchA = 0;
-        // Read normalized values
-        Vector normG = mpu.readNormalizeGyro();
-        Vector normAccel = mpu.readNormalizeAccel();
-        // Calculate Pitch and Roll
-        pitchG = pitchG + normG.YAxis * (MPU_TIMESTEP/1000.0);
-        pitchA = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis*normAccel.YAxis + normAccel.ZAxis*normAccel.ZAxis))*180.0)/PI;
-        this->pitch = GYRO_WEIGHT * pitchG + ACCEL_WEIGHT * pitchA;
-        observedAngle = this->pitch;
-        dt = millis();
-    }
+float Sensors::getPitch(){
+    static unsigned long prev = 0;
+
+    Vector normG = mpu.readNormalizeGyro();
+    unsigned long t = millis();
+    double dt = (t - prev)/1000.0;
+    prev = t;
+    
+    // Calculate Pitch and Roll
+    this->pitchG = this->pitch + (normG.YAxis * dt);
+
+    Vector normAccel = mpu.readNormalizeAccel();
+    this->pitchA = -(atan2(normAccel.XAxis, sqrt(normAccel.YAxis*normAccel.YAxis + normAccel.ZAxis*normAccel.ZAxis))*180.0)/PI;
+
+    this->pitch = (GYRO_WEIGHT * this->pitchG) + (ACCEL_WEIGHT * this->pitchA);
+
+    
+    Serial.print("Angle: ");
+    Serial.print(this->pitch);
+
+    return this->pitch;
 }
 
 void Sensors::gyroCalibrate(){

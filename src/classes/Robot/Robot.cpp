@@ -107,35 +107,40 @@ bool Robot::raiseMid(int16_t speed){
     //Use a gyro axis to keep stage level, speeding up stages to compensate
     //Only run when rear is open and front is closed or opening
     float angle;
+    int rEff;
+    int fEff;
     switch(botState){
         case IDLE:
             if(this->scissors->fState == Scissors::OPENING){botState = RAISINGMID;}
             break;
-
         case RAISINGMID:
-            this->sensors->getPitch(angle);
+            angle = this->sensors->getPitch();
             int effort = this->stagePID->calcPID(0.0, angle, MAX_DRIVE_SPEED);
-            if(effort<=0){
-                this->scissors->lowerFront(speed);
-                this->scissors->lowerRear(speed-abs(effort));
+            if(effort>=0){
+                fEff = speed;
+                rEff = speed-abs(effort);
             }
             else{
-                this->scissors->lowerFront(speed-abs(effort));
-                this->scissors->lowerRear(speed);
+                fEff = speed-abs(effort);
+                rEff = speed;
             }
-            if(this->scissors->fState == Scissors::OPEN){
+            this->scissors->lowerFront(fEff);
+            this->scissors->lowerRear(rEff);
+
+            if(this->scissors->fState == Scissors::OPEN && abs(0.0-angle) <= 0.02){
                 this->scissors->frontSpeed(0);
                 this->scissors->rearSpeed(0);
                 botState = IDLE;
                 return true;
             }
-            Serial.print("ANGLE: ");
-            Serial.print(angle);
-            Serial.print("\t\tEffort:");
-            Serial.println(effort);
             break;
     }
 
+    Serial.print("\t\tFront Effort: ");
+    Serial.print(fEff);
+    Serial.print("\t\tRear Effort: ");
+    Serial.println(rEff);
+    
     return false;
 }
 

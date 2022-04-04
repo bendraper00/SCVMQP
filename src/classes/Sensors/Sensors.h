@@ -16,7 +16,7 @@ class Sensors{
         uint16_t getRangeMagnitude();
         int16_t getDifference();
         void getRangeData(int& mag, int& diff);
-        void getPitch(float& observedAngle);
+        float getPitch();
         uint8_t ranges[TOF_SENSOR_COUNT];
         void gyroCalibrate(); //Maybe add dynamic bias calibration later
         MPU6050 mpu;
@@ -25,6 +25,8 @@ class Sensors{
         Adafruit_VL6180X sensA;
         Adafruit_VL6180X sensB;
         Adafruit_VL6180X* sens[TOF_SENSOR_COUNT];
+        float pitchG = 0.0;
+        float pitchA = 0.0;
         float pitch = 0.0;
 };
 
