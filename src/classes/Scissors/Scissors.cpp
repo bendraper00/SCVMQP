@@ -73,6 +73,7 @@ void Scissors::raiseFront(int16_t speed){
 
         case CLOSING:
             if(digitalRead(this->frontClosedEs) == LOW){
+                this->frontSpeed(0);
                 frontState = CLOSED;
                 break;
                 }
@@ -98,6 +99,7 @@ void Scissors::lowerFront(int16_t speed){
         case OPENING:
             if(digitalRead(this->frontOpenEs) == LOW){ //If for some reason you try to lower and the ISR can't run
                 frontState = OPEN;
+                this->frontSpeed(0);
                 break;
             }
             this->frontSpeed(speed);
@@ -128,6 +130,7 @@ void Scissors::lowerRear(int16_t speed){
 
         case CLOSING:
              if(digitalRead(this->rearClosedEs) == LOW){
+                this->rearSpeed(0);
                 rearState = CLOSED;
                 break;
             }
@@ -153,6 +156,7 @@ void Scissors::raiseRear(int16_t speed){
     switch (rearState){
         case OPENING:
             if(digitalRead(this->rearOpenEs) == LOW){ //If for some reason you try to raise and the ISR can't run
+                this->rearSpeed(0);
                 rearState = OPEN;
                 break;
             }

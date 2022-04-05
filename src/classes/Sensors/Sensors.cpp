@@ -62,6 +62,7 @@ uint16_t Sensors::getRangeMagnitude(){
         case 0:
             if(this->sens[0]->readRange(range)){
                 tempMag += range;
+                this->sensor_ranges[0] = range;
                 _magnitudeState = 1;
             }
             break;
@@ -70,6 +71,7 @@ uint16_t Sensors::getRangeMagnitude(){
                 tempMag += range;
                 magnitude = tempMag/TOF_SENSOR_COUNT;
                 tempMag = 0;
+                this->sensor_ranges[1] = range;
                 _magnitudeState = 0;
             }
             break;
@@ -115,6 +117,7 @@ void Sensors::getRangeData(int& mag, int& diff){
             if(this->sens[0]->readRange(range)){
                 tempMag += range;
                 tempDif = range;
+                this->sensor_ranges[0] = range;
                 _magnitudeState = 1;
             }
             break;
@@ -126,12 +129,18 @@ void Sensors::getRangeData(int& mag, int& diff){
                 difference = tempDif;
                 tempDif = 0;
                 tempMag = 0;
+                this->sensor_ranges[1] = range;
                 _magnitudeState = 0;
             }
             break;
     }
     mag = magnitude;
     diff = difference;
+
+    Serial.print("MAG: ");
+    Serial.print(magnitude);
+    Serial.print("\t\tDIFF: ");
+    Serial.println(difference);
 }
 
 float Sensors::getPitch(){

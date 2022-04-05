@@ -3,6 +3,7 @@
 
 volatile uint8_t readyToRPID = 0;
 volatile uint8_t readyToFPID = 0;
+
 Encoder* encP;
 volatile int32_t frontSpeedCounts = 0;
 volatile int32_t rearSpeedCounts = 0;
@@ -54,12 +55,15 @@ void DriveModule::driveSpeed(int16_t target){
 }
 
 void DriveModule::pidRSpeed(int16_t target){
-   if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
-     this->driveSpeed(0);
-   }
-   else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
-     offGround = false;
-   }
+  if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
+    this->driveSpeed(0);
+  }
+  else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
+    offGround = false;
+  }
+  else if(target == 0){
+    this->driveSpeed(0);
+  }
   else if(readyToRPID){
     readyToRPID = 0;
     int effort = this->rearPID->calcPIDSpeed(target, rearSpeedCounts, MAX_DRIVE_SPEED);
@@ -68,12 +72,15 @@ void DriveModule::pidRSpeed(int16_t target){
 }
 
 void DriveModule::pidFSpeed(int16_t target){
-   if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
+  if(offGround == true && millis() - timeOffGround < OFF_GROUND_BUFFER_MS){
      this->driveSpeed(0);
    }
-   else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
+  else if(offGround == true && millis() - timeOffGround >= OFF_GROUND_BUFFER_MS){
      offGround = false;
-   }
+  }
+  else if(target == 0){
+    this->driveSpeed(0);
+  }
   else if(readyToFPID){
     readyToFPID = 0;
     int effort = this->frontPID->calcPIDSpeed(target, frontSpeedCounts, MAX_DRIVE_SPEED);
@@ -97,9 +104,6 @@ boolean DriveModule::driveDist(float target){
   static uint16_t effortSpeed = 0;
   this->enc->updateCounts();
   int16_t currCounts = this->enc->getFrontCounts();
-
-  //Serial.println("STATE: " + String(state) + "\t\tEffort: " + String(effortSpeed) + "\t\tDirection: " + String(dir));
-  //Serial.println("TARGET: " + String(this->targetCounts) + "\t\tCURRENT: " + String(currCounts) + "\t\tERROR: " + String(error));
 
   //For initial call of this function, set the target counts
   if(this->moving == false){
@@ -127,7 +131,7 @@ boolean DriveModule::driveDist(float target){
         state = WAITING;
       }
       break;
-
+ 
     case WAITING:
       //If 1 second has elapsed since definition of startTime, return true
       this->motor->stop(); 

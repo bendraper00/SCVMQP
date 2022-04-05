@@ -25,6 +25,8 @@ void Robot::init(){
     this->scissors->init();
     Serial.println("Scissor Lifts Initialized");
     this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);
+    this->allignPID = new PIDController(PID_ALLIGN_KP, PID_ALLIGN_KI, PID_ALLIGN_KD);
+    this->distPID = new PIDController(PID_DIST_KP, PID_DIST_KI, PID_DIST_KD);
 
     pinMode(FRONT_WHEEL_SWITCH, INPUT_PULLUP);
     pinMode(REAR_WHEEL_SWITCH, INPUT_PULLUP);
@@ -78,17 +80,32 @@ bool Robot::home(){
 }
 
 bool Robot::raiseFront(int16_t speed){
-    switch(botState){
+    static RobotState raiseState = IDLE;
+    static RobotState tempState;
+    static unsigned long t = 0;
+
+    switch(raiseState){
         case IDLE:
-            this->botState = RAISINGFRONT;
+            raiseState = RAISINGFRONT;
             break;
 
         case RAISINGFRONT:
-            if(this->scissors->fState == Scissors::CLOSED){botState = LOWERINGFRONT;}
-            this->scissors->raiseFront(speed);
+            if(this->scissors->fState == Scissors::CLOSED){
+                tempState = DRIVING;
+                raiseState = WAITING;
+                t = millis();
+            }
+            else{
+                this->scissors->raiseFront(speed);
+            }
             break;
 
         //ADD CASE FOR MOVING FORWARD x MM AWAY FROM STEP
+        case DRIVING:
+            if(this->driveTo(80)){
+                botState = LOWERINGFRONT;
+            }
+            break;
 
         case LOWERINGFRONT:
             if(digitalRead(FRONT_WHEEL_SWITCH)){
@@ -97,6 +114,12 @@ bool Robot::raiseFront(int16_t speed){
                 return true;
             }
             this->scissors->lowerFront(speed);
+            break;
+
+        case WAITING:
+            if(millis() - t >= delay){
+                botState = tempState;
+            }
             break;
 
     }
@@ -135,15 +158,186 @@ bool Robot::raiseMid(int16_t speed){
             }
             break;
     }
-
-    Serial.print("\t\tFront Effort: ");
-    Serial.print(fEff);
-    Serial.print("\t\tRear Effort: ");
-    Serial.println(rEff);
-    
     return false;
 }
 
 bool Robot::raiseRear(){
     this->scissors->raiseRear(200);
+}
+
+bool Robot::allignStep(){
+    static RobotState tempState;
+    static int magnitude = 0;
+    static int difference = 0;
+    static bool firstPass = true;
+    static unsigned long t = 0;
+    
+    sensors->getRangeData(magnitude, difference);
+
+    switch(botState){
+        case IDLE:
+            this->frontDrive->setWheelAngle(0);
+            this->rearDrive->setWheelAngle(0);
+            botState = APPROACHING;
+            break;
+
+        case WAITING:
+            if(millis() - t >= delay){
+                botState = tempState;
+                this->allignPID->reset();
+            }
+            break;
+
+        case APPROACHING:
+            if(magnitude == DIST_TO_STEP && difference == 0){
+                this->pidSpeed(0);
+                return true;
+            }
+
+            else if(firstPass == true && (this->sensors->sensor_ranges[0] == DIST_TO_STEP || this->sensors->sensor_ranges[1] == DIST_TO_STEP)){
+                this->pidSpeed(0);
+                firstPass = false;
+                botState = WAITING;
+                tempState = ALLIGNING;
+                this->allignPID->reset();
+                t = millis();
+            }
+            else if(firstPass == false){
+                if(magnitude == DIST_TO_STEP){
+                    this->pidSpeed(0);
+                    firstPass = true;
+                    return true;
+                }
+                else{
+                    this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, magnitude, MAX_DRIVE_SPEED));
+                }
+            }
+            else{
+                int smallestRange = this->sensors->sensor_ranges[0];
+                if(this->sensors->sensor_ranges[1] < this->sensors->sensor_ranges[0]){smallestRange = this->sensors->sensor_ranges[1];}
+                this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, smallestRange, 75));
+            }
+            break;
+
+        case ALLIGNING:
+            this->rearDrive->setWheelAngle(90);
+            this->rearDrive->pidRSpeed(this->allignPID->calcPID(10, difference, 75));
+            if(difference == 10){
+                this->rearDrive->setWheelAngle(0);
+                this->rearDrive->pidRSpeed(0);
+                botState = WAITING;
+                tempState = APPROACHING;
+                this->allignPID->reset();
+                t = millis();
+            }
+            break;
+    }
+    return false;
+}
+
+bool Robot::driveTo(float mm){
+    int curr = this->encoders->getFrontCounts();
+    static long target =  curr - this->encoders->distToCounts(mm);
+    Serial.println(target);
+    static int effort;
+    static long prevMicros = 0;
+
+    if(micros()-prevMicros >= 800){
+        prevMicros = micros();
+        effort = this->distPID->calcPID(target, curr, HALF_SPEED, 20000);
+    }
+
+    this->pidSpeed(effort);
+
+    if(curr == target){
+        this->pidSpeed(0);
+        this->distPID->reset();
+        return true;
+    }
+
+    return false;
+}
+
+bool Robot::ascendStep(){
+    static RobotState tempState;
+    static RobotState driveState;
+    int dist;
+    static unsigned long t = 0;
+
+    switch(botState){
+        case IDLE:
+            botState = RAISINGFRONT;
+            Serial.println("CALIBRATING");
+            this->sensors->gyroCalibrate();
+            Serial.println("CALIBRATED");
+            break;
+
+        case RAISINGFRONT:
+            if(this->scissors->fState == Scissors::CLOSED){
+                tempState = DRIVING;
+                dist = 80;
+                botState = WAITING;
+                driveState = LOWERINGFRONT;
+                t = millis();
+            }
+            else{
+                this->scissors->raiseFront(MAX_DRIVE_SPEED);
+            }
+            break;
+
+        //ADD CASE FOR MOVING FORWARD x MM AWAY FROM STEP
+        case DRIVING:
+            if(this->driveTo(dist)){
+                botState = driveState;
+                
+                if(botState == IDLE){
+                    return true;
+                }
+            }
+            break;
+
+        case LOWERINGFRONT:
+            if(digitalRead(FRONT_WHEEL_SWITCH)){
+                this->scissors->frontSpeed(0);
+                botState = WAITING;
+                tempState = RAISINGMID;
+                t = millis();
+            }
+            else{
+                this->scissors->lowerFront(MAX_DRIVE_SPEED);
+            }
+            break;
+
+        case RAISINGMID:
+            if(this->raiseMid(MAX_DRIVE_SPEED)){
+                botState = WAITING;
+                tempState = DRIVING;
+                driveState = RAISINGREAR;
+                t = millis();
+                dist = 150;
+            }
+            break;
+
+        case RAISINGREAR:
+            if(this->scissors->rState == Scissors::OPEN){
+                tempState = DRIVING;
+                botState = WAITING;
+                driveState = IDLE;
+                dist = 140;
+                t = millis();
+            }
+            else{
+                this->scissors->raiseFront(MAX_DRIVE_SPEED);
+            }
+            break;
+
+        case WAITING:
+            if(millis() - t >= delay){
+                botState = tempState;
+            }
+            break;
+    }
+
+    Serial.println(botState);
+    return false;
 }
