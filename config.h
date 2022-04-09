@@ -48,8 +48,8 @@ static const int IR_REMOTE_SIGNAL = 47;
 
 //Other Variables
 static const uint8_t MAX_DRIVE_SPEED = 255;
-static const uint8_t HALF_SPEED = 127;
-static const uint8_t QUARTER_SPEED = 63;
+static const uint8_t HALF_SPEED = 100;
+static const uint8_t QUARTER_SPEED = 65;
 static const uint8_t DEMO_DRIVE_SPEED = 80;
 static const uint8_t CONTROLLED_DRIVE_SPEED = 100;
 
@@ -67,17 +67,17 @@ static const float PID_SPEED_KP = 1.0;
 static const float PID_SPEED_KI = 0.2;
 static const float PID_SPEED_KD = 10.0;
 
-static const float PID_DIST_KP = 0.08;
-static const float PID_DIST_KI = 0.0001;
-static const float PID_DIST_KD = 0.1;
+static const float PID_DIST_KP = 0.3;
+static const float PID_DIST_KI = 0.03;
+static const float PID_DIST_KD = 0.8;
 
-static const float PID_SCISSOR_KP = 50.0;
-static const float PID_SCISSOR_KI = 0.1;
+static const float PID_SCISSOR_KP = 48.0;
+static const float PID_SCISSOR_KI = 0.12;
 static const float PID_SCISSOR_KD = 5.0;
 
-static const float PID_ALLIGN_KP = 2.0;
+static const float PID_ALLIGN_KP = 1.0;
 static const float PID_ALLIGN_KI = 0.01;
-static const float PID_ALLIGN_KD = 3.0;
+static const float PID_ALLIGN_KD = 5.0;
 
 static const int LOX1_ADDRESS = 0x30;
 static const int LOX2_ADDRESS = 0x31;
@@ -86,11 +86,12 @@ static const int LOX2_SHT = 33;
 static const int TOF_SENSOR_COUNT = 2;
 static const int TOF_PERIOD = 10;
 
+static const float LEVEL_ANGLE = -3.0;
 static const float GYRO_WEIGHT = 0.95;
 static const float ACCEL_WEIGHT = 0.05;
 static const float MPU_TIMESTEP = 10.0;
 
-static const int DIST_TO_STEP = 40;
+static const int DIST_TO_STEP = 65;
 
 
 #endif

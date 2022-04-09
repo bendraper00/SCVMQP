@@ -18,15 +18,27 @@ void setup()
   ir.enableIRIn();
   bot.frontDrive->setWheelAngle(0);
   bot.rearDrive->setWheelAngle(0);
+
   Serial.println("HOMING");
   while(!bot.home());
   Serial.println("HOMED");
 }
 
-void loop()
-{
+void loop(){
+  static bool flag = false;
   switch(testState){
     case 0:
+      //Serial.println(bot.scissors->rState);
+      //bot.scissors->raiseRear(MAX_DRIVE_SPEED);
+      //bot.scissors->rearSpeed(-80);
+
+      //bot.scissors->lowerRear(MAX_DRIVE_SPEED);
+      //if(bot.scissors->rState == Scissors::CLOSED){testState = 1;}
+      
+
+      //bot.scissors->lowerRear(MAX_DRIVE_SPEED);
+
+      
       if(bot.ascendStep()){testState = 1;}
       break;
 
@@ -35,3 +47,5 @@ void loop()
   }
 }
 
+
+//ROBOT GETS STUCK HOMING AND CALIBRATING 

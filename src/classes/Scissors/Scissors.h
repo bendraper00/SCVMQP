@@ -17,6 +17,7 @@ class Scissors{
         static void scissorROISR();
         void frontSpeed(int16_t speed);
         void rearSpeed(int16_t speed);
+        bool stepRearDown();
 
         enum ScissorState{OPENING, CLOSING, OPEN, CLOSED};
         ScissorState fState = OPENING;

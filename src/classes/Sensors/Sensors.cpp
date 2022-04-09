@@ -167,7 +167,7 @@ float Sensors::getPitch(){
 }
 
 void Sensors::gyroCalibrate(){
-    this->mpu.calibrateGyro();
+    this->mpu.calibrateGyro(100);
 }
 
 

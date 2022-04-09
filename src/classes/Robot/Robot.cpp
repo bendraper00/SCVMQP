@@ -26,7 +26,8 @@ void Robot::init(){
     Serial.println("Scissor Lifts Initialized");
     this->stagePID = new PIDController(PID_SCISSOR_KP, PID_SCISSOR_KI, PID_SCISSOR_KD);
     this->allignPID = new PIDController(PID_ALLIGN_KP, PID_ALLIGN_KI, PID_ALLIGN_KD);
-    this->distPID = new PIDController(PID_DIST_KP, PID_DIST_KI, PID_DIST_KD);
+    this->distPIDF = new PIDController(PID_DIST_KP, PID_DIST_KI, PID_DIST_KD);
+    this->distPIDR = new PIDController(PID_DIST_KP, PID_DIST_KI, PID_DIST_KD);
 
     pinMode(FRONT_WHEEL_SWITCH, INPUT_PULLUP);
     pinMode(REAR_WHEEL_SWITCH, INPUT_PULLUP);
@@ -69,6 +70,7 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
 }
 
 bool Robot::home(){
+    Serial.println(this->scissors->rState);
     if(!digitalRead(FRONT_OPEN_ENDSTOP) && !digitalRead(REAR_OPEN_ENDSTOP)){
         return true;
     }
@@ -138,7 +140,7 @@ bool Robot::raiseMid(int16_t speed){
             break;
         case RAISINGMID:
             angle = this->sensors->getPitch();
-            int effort = this->stagePID->calcPID(0.0, angle, MAX_DRIVE_SPEED);
+            int effort = this->stagePID->calcPID(LEVEL_ANGLE, angle, MAX_DRIVE_SPEED);
             if(effort>=0){
                 fEff = speed;
                 rEff = speed-abs(effort);
@@ -150,7 +152,7 @@ bool Robot::raiseMid(int16_t speed){
             this->scissors->lowerFront(fEff);
             this->scissors->lowerRear(rEff);
 
-            if(this->scissors->fState == Scissors::OPEN && abs(0.0-angle) <= 0.02){
+            if(this->scissors->fState == Scissors::OPEN && abs(LEVEL_ANGLE-angle) <= 0.02){
                 this->scissors->frontSpeed(0);
                 this->scissors->rearSpeed(0);
                 botState = IDLE;
@@ -159,10 +161,6 @@ bool Robot::raiseMid(int16_t speed){
             break;
     }
     return false;
-}
-
-bool Robot::raiseRear(){
-    this->scissors->raiseRear(200);
 }
 
 bool Robot::allignStep(){
@@ -235,25 +233,67 @@ bool Robot::allignStep(){
     return false;
 }
 
+bool Robot::driveUpTo(float mm){
+    static bool resetFlag = true;
+    static int magnitude = 0;
+    static int difference = 0;
+    if(resetFlag){
+        resetFlag = false;
+        this->allignPID->reset();
+    }
+    sensors->getRangeData(magnitude, difference);
+    if(magnitude == DIST_TO_STEP){
+        this->pidSpeed(0);
+        resetFlag = true;
+        return true;
+    }
+    else{
+        this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, magnitude, QUARTER_SPEED, 1000));
+        return false;
+    }
+}
+
 bool Robot::driveTo(float mm){
-    int curr = this->encoders->getFrontCounts();
-    static long target =  curr - this->encoders->distToCounts(mm);
-    Serial.println(target);
-    static int effort;
+    static bool reset = true;
+    int currF = this->encoders->getFrontCounts();
+    int currR = this->encoders->getRearCounts();
+    static long targetF =  currF - this->encoders->distToCounts(mm);
+    static long targetR =  currR - this->encoders->distToCounts(mm);
+    static int effortF;
+    static int effortR;
     static long prevMicros = 0;
+
+    if(reset == true){
+        reset = false;
+        this->distPIDF->reset();
+        this->distPIDR->reset();
+        targetF =  currF - this->encoders->distToCounts(mm);
+        targetR =  currR - this->encoders->distToCounts(mm);
+        prevMicros = micros();
+    }
 
     if(micros()-prevMicros >= 800){
         prevMicros = micros();
-        effort = this->distPID->calcPID(target, curr, HALF_SPEED, 20000);
+        effortF = this->distPIDF->calcPID(targetF, currF, QUARTER_SPEED, 1000);
+        effortR = this->distPIDR->calcPID(targetR, currR, QUARTER_SPEED, 1000);
     }
 
-    this->pidSpeed(effort);
+    this->frontDrive->pidFSpeed(effortF);
+    this->rearDrive->pidRSpeed(effortR);
 
-    if(curr == target){
+    if(abs(targetF - currF) <= 7 && abs(targetR - currR) <= 7){
         this->pidSpeed(0);
-        this->distPID->reset();
+        this->distPIDF->reset();
+        this->distPIDR->reset();
+        reset = true;
         return true;
     }
+
+    Serial.print(targetR);
+    Serial.print("\t");
+    Serial.print(currR);
+    Serial.print("\t");
+    Serial.println(effortR);
 
     return false;
 }
@@ -261,7 +301,7 @@ bool Robot::driveTo(float mm){
 bool Robot::ascendStep(){
     static RobotState tempState;
     static RobotState driveState;
-    int dist;
+    static int dist;
     static unsigned long t = 0;
 
     switch(botState){
@@ -274,14 +314,24 @@ bool Robot::ascendStep(){
 
         case RAISINGFRONT:
             if(this->scissors->fState == Scissors::CLOSED){
-                tempState = DRIVING;
-                dist = 80;
+                botState = STEPREAR;
+            }
+            else{
+                this->scissors->raiseFront(MAX_DRIVE_SPEED);
+            }
+            break;
+
+        case STEPREAR:
+            if(this->scissors->stepRearDown()){
+                this->scissors->rearSpeed(0);
                 botState = WAITING;
+                tempState = DRIVING;
+                dist = 65;
                 driveState = LOWERINGFRONT;
                 t = millis();
             }
             else{
-                this->scissors->raiseFront(MAX_DRIVE_SPEED);
+                this->scissors->lowerRear(MAX_DRIVE_SPEED);
             }
             break;
 
@@ -290,6 +340,15 @@ bool Robot::ascendStep(){
             if(this->driveTo(dist)){
                 botState = driveState;
                 
+                if(botState == IDLE){
+                    return true;
+                }
+            }
+            break;
+
+        case DRIVEUPTO:
+            if(this->driveUpTo(DIST_TO_STEP)){
+                botState = driveState;
                 if(botState == IDLE){
                     return true;
                 }
@@ -314,20 +373,19 @@ bool Robot::ascendStep(){
                 tempState = DRIVING;
                 driveState = RAISINGREAR;
                 t = millis();
-                dist = 150;
+                dist = 125;
             }
             break;
 
         case RAISINGREAR:
             if(this->scissors->rState == Scissors::OPEN){
-                tempState = DRIVING;
+                tempState = DRIVEUPTO;
                 botState = WAITING;
                 driveState = IDLE;
-                dist = 140;
                 t = millis();
             }
             else{
-                this->scissors->raiseFront(MAX_DRIVE_SPEED);
+                this->scissors->raiseRear(MAX_DRIVE_SPEED);
             }
             break;
 
@@ -337,7 +395,5 @@ bool Robot::ascendStep(){
             }
             break;
     }
-
-    Serial.println(botState);
     return false;
 }

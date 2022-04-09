@@ -78,7 +78,7 @@ int PIDController::calcPID(float target, float curr, int32_t cap){
   return output;
 }
 
-int PIDController::calcPID(float target, float curr, int32_t cap, uint32_t integralCap){
+int PIDController::calcPID(float target, float curr, int32_t cap, long integralCap){
   if(this->rs == true){
     this->rs = false;
     this->errorSum = 0.0;
@@ -88,7 +88,9 @@ int PIDController::calcPID(float target, float curr, int32_t cap, uint32_t integ
   }
 
   float error = target - curr;
-  if(abs(errorSum) < integralCap){this->errorSum += error;}
+  this->errorSum += error;
+  if(this->errorSum > integralCap){this->errorSum = integralCap;}
+  if(this->errorSum < (-1*integralCap)){this->errorSum = -1 * integralCap;}
   float dError = (error - this->prevError)/(millis()-prevTime);
   this->prevError = error;
   this->prevTime = millis();

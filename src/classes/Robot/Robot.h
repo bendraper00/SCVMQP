@@ -22,19 +22,31 @@ class Robot{
         void stairFollow(int16_t speed, uint8_t dist);
         bool raiseFront(int16_t speed); //Raises front stage
         bool raiseMid(int16_t speed); //Closes front stage and opens rear state
-        bool raiseRear(); //Closes rear stage
         bool allignStep();
         bool ascendStep();
         bool driveTo(float mm);
+        bool driveUpTo(float mm);
 
-        enum RobotState{APPROACHING, ALLIGNING, RAISINGFRONT, LOWERINGFRONT, RAISINGMID, RAISINGREAR, IDLE, WAITING, DRIVING};
+        enum RobotState{APPROACHING, 
+                        ALLIGNING, 
+                        RAISINGFRONT, 
+                        LOWERINGFRONT, 
+                        RAISINGMID,
+                        RAISINGREAR,
+                        LOWERINGREAR,
+                        STEPREAR, 
+                        IDLE, 
+                        WAITING, 
+                        DRIVING,
+                        DRIVEUPTO};
         RobotState botState = IDLE;
         
     private:
         PIDController* stagePID;
         PIDController* allignPID;
-        PIDController* distPID;
-        int delay = 2000;
+        PIDController* distPIDF;
+        PIDController* distPIDR;
+        int delay = 1000;
 };
 
 #endif

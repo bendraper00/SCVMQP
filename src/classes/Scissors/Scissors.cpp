@@ -1,7 +1,7 @@
 #include "Scissors.h"
 
-Scissors::ScissorState frontState;
-Scissors::ScissorState rearState;
+static Scissors::ScissorState frontState;
+static Scissors::ScissorState rearState;
 
 Scissors::Scissors(){
     this->frontMotor = new L298N(FRONT_SCISSOR_EN, FRONT_SCISSOR_IN1, FRONT_SCISSOR_IN2);
@@ -21,8 +21,14 @@ void Scissors::init(){
     pinMode(this->frontClosedEs, INPUT_PULLUP);
     pinMode(this->rearOpenEs, INPUT_PULLUP);
     pinMode(this->rearClosedEs, INPUT_PULLUP);
+
+    delay(10);
+    noInterrupts();
     attachInterrupt(digitalPinToInterrupt(this->frontOpenEs), Scissors::scissorFOISR, FALLING);
     attachInterrupt(digitalPinToInterrupt(this->rearOpenEs), Scissors::scissorROISR, FALLING);
+    interrupts();
+    delay(10);
+
     if(digitalRead(this->frontOpenEs)== HIGH){
         frontState = CLOSED;
         this->fState = CLOSED;
@@ -90,7 +96,6 @@ void Scissors::raiseFront(int16_t speed){
             break;
     }
     this->fState = frontState;
-    this->rState = rearState;
 }
 
 void Scissors::lowerFront(int16_t speed){
@@ -117,7 +122,6 @@ void Scissors::lowerFront(int16_t speed){
             break;
     }
     this->fState = frontState;
-    this->rState = rearState;
 }
 
 void Scissors::lowerRear(int16_t speed){
@@ -146,11 +150,12 @@ void Scissors::lowerRear(int16_t speed){
             this->rearSpeed(0);
             break;
     }
-    this->fState = frontState;
     this->rState = rearState;
 }
 
-//INCORRECT USE OF OPEN AND CLOSE
+
+
+
 void Scissors::raiseRear(int16_t speed){
     if(rearState == CLOSED || rearState == CLOSING){rearState = OPENING;}
     switch (rearState){
@@ -177,8 +182,28 @@ void Scissors::raiseRear(int16_t speed){
             this->rearSpeed(0);
             break;
     }
-    this->fState = frontState;
     this->rState = rearState;
+}
+
+
+
+
+bool Scissors::stepRearDown(){
+    static long t = 0;
+    static bool flag = true;
+    if(flag){
+        flag = false;
+        t = millis();
+    }
+    if(millis()-t >= 250){
+        this->rearSpeed(0);
+        flag = true;
+        return true;
+    }
+    else{
+        this->lowerRear(MAX_DRIVE_SPEED);
+        return false;
+    }
 }
 
 //Front open ISR

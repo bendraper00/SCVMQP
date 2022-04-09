@@ -20,7 +20,7 @@ class PIDController{
 
         int calcPIDSpeed(int32_t target, int32_t curr, int32_t cap);
         int calcPID(float target, float curr, int32_t cap);
-        int calcPID(float target, float curr, int32_t cap, uint32_t integralCap);
+        int calcPID(float target, float curr, int32_t cap, long integralCap);
 
     private:
 };
