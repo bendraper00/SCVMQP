@@ -20,6 +20,7 @@ class Robot{
         bool home();
         void pidSpeed(int16_t speed);
         void stairFollow(int16_t speed, uint8_t dist);
+        bool cleanStep();
         bool raiseFront(int16_t speed); //Raises front stage
         bool raiseMid(int16_t speed); //Closes front stage and opens rear state
         bool allignStep();
@@ -38,7 +39,11 @@ class Robot{
                         IDLE, 
                         WAITING, 
                         DRIVING,
-                        DRIVEUPTO};
+                        DRIVEUPTO,
+                        CLEANLEFT,
+                        CLEANRIGHT,
+                        CLEANING
+                        };
         RobotState botState = IDLE;
         
     private:

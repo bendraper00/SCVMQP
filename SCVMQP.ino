@@ -28,18 +28,8 @@ void loop(){
   static bool flag = false;
   switch(testState){
     case 0:
-      //Serial.println(bot.scissors->rState);
-      //bot.scissors->raiseRear(MAX_DRIVE_SPEED);
-      //bot.scissors->rearSpeed(-80);
-
-      //bot.scissors->lowerRear(MAX_DRIVE_SPEED);
-      //if(bot.scissors->rState == Scissors::CLOSED){testState = 1;}
-      
-
-      //bot.scissors->lowerRear(MAX_DRIVE_SPEED);
-
-      
       if(bot.ascendStep()){testState = 1;}
+      //if(bot.allignStep()){testState = 1;}
       break;
 
     case 1:

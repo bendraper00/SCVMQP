@@ -81,6 +81,62 @@ bool Robot::home(){
     }
 }
 
+bool Robot::cleanStep(){
+    static RobotState cleanState = IDLE;
+    static RobotState tempState;
+    static int cleaningSpeed = HALF_SPEED;
+    static unsigned long t = 0;
+    
+
+    switch(cleanState){
+        case IDLE:
+            cleanState = CLEANLEFT;
+            this->distPIDF->reset();
+            this->distPIDR->reset();
+            this->frontDrive->setWheelAngle(90);
+            this->rearDrive->setWheelAngle(90);
+            break;
+
+        case CLEANLEFT:
+            this->stairFollow(cleaningSpeed, DIST_TO_STEP);
+            if(!digitalRead(BUMP_LEFT)){
+                t = millis();
+                this->pidSpeed(0);
+                cleanState = WAITING;
+                tempState = CLEANRIGHT;
+            }
+            break;
+
+        case CLEANRIGHT:
+            this->stairFollow((cleaningSpeed * -1), DIST_TO_STEP);
+            if(!digitalRead(BUMP_RIGHT)){
+                t = millis();
+                this->pidSpeed(0);
+                cleanState = WAITING;
+                tempState = DRIVING;
+            }
+            break;
+
+        case DRIVING:
+            if(this->driveDist(50)){
+                this->frontDrive->setWheelAngle(0);
+                this->rearDrive->setWheelAngle(0);
+                cleanState = IDLE;
+                this->distPIDF->reset();
+                this->distPIDR->reset();
+                return true;
+            }
+            break;
+
+        case WAITING:
+            if(millis() - t >= delay){
+                cleanState = tempState;
+            }
+            break;
+    }
+    return false;
+}
+
 bool Robot::raiseFront(int16_t speed){
     static RobotState raiseState = IDLE;
     static RobotState tempState;
@@ -165,69 +221,111 @@ bool Robot::raiseMid(int16_t speed){
 
 bool Robot::allignStep(){
     static RobotState tempState;
+    static RobotState allignState = IDLE;
     static int magnitude = 0;
     static int difference = 0;
     static bool firstPass = true;
     static unsigned long t = 0;
-    
     sensors->getRangeData(magnitude, difference);
-
-    switch(botState){
+    
+    switch(allignState){
         case IDLE:
             this->frontDrive->setWheelAngle(0);
             this->rearDrive->setWheelAngle(0);
-            botState = APPROACHING;
+            allignState = WAITING;
+            tempState = APPROACHING;
+            t = millis();
             break;
 
         case WAITING:
             if(millis() - t >= delay){
-                botState = tempState;
+                allignState = tempState;
                 this->allignPID->reset();
             }
             break;
 
         case APPROACHING:
+
+            //Alligned
             if(magnitude == DIST_TO_STEP && difference == 0){
                 this->pidSpeed(0);
                 return true;
             }
 
+            //First Pass and one of the sensors is at correct distance
             else if(firstPass == true && (this->sensors->sensor_ranges[0] == DIST_TO_STEP || this->sensors->sensor_ranges[1] == DIST_TO_STEP)){
                 this->pidSpeed(0);
                 firstPass = false;
-                botState = WAITING;
+                allignState = WAITING;
                 tempState = ALLIGNING;
+                this->rearDrive->setWheelAngle(90);
                 this->allignPID->reset();
                 t = millis();
             }
+
+            //Approaching on after alligning
             else if(firstPass == false){
+                //DONE
                 if(magnitude == DIST_TO_STEP){
                     this->pidSpeed(0);
+                    allignState = IDLE;
+                    this->allignPID->reset();
                     firstPass = true;
                     return true;
                 }
+                //Drive forward to distance
                 else{
-                    this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, magnitude, MAX_DRIVE_SPEED));
+                    this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, magnitude, HALF_SPEED, 1000));
                 }
             }
+
+            //Drive forward
             else{
                 int smallestRange = this->sensors->sensor_ranges[0];
-                if(this->sensors->sensor_ranges[1] < this->sensors->sensor_ranges[0]){smallestRange = this->sensors->sensor_ranges[1];}
-                this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, smallestRange, 75));
+                if(this->sensors->sensor_ranges[1] < smallestRange){smallestRange = this->sensors->sensor_ranges[1];}
+                this->pidSpeed(this->allignPID->calcPID(DIST_TO_STEP, smallestRange, QUARTER_SPEED, 1000));
             }
             break;
 
         case ALLIGNING:
-            this->rearDrive->setWheelAngle(90);
-            this->rearDrive->pidRSpeed(this->allignPID->calcPID(10, difference, 75));
-            if(difference == 10){
-                this->rearDrive->setWheelAngle(0);
+            static bool settled = false;
+            static bool settling = false;
+            Serial.println(settling);
+
+            //Target 0 + ANGLE_OFFSET is to compensate for the wheel returning to 0 degrees possible shifting the robot
+            this->rearDrive->pidRSpeed(this->allignPID->calcPID((0 + ANGLE_OFFSET), difference, QUARTER_SPEED, 1000));
+
+
+            //Angle met and not yet settling, start timer
+            if(abs((0 + ANGLE_OFFSET) - difference) <= 7 && settling == false){
+                settling = true;
+                t = millis();
+            }
+
+            //Angle met and settled for half a second
+            else if(abs((0 + ANGLE_OFFSET) - difference) <= 7 && settling == true){
+                if(millis()-t >= 500){
+                    settled = true;
+                    settling = false;
+                }
+            }
+
+            //Angle not met or not met for long enough i.e. overshot
+            else{
+                settling = false;
+            }
+
+
+            if(settled){
+                settled = false;
                 this->rearDrive->pidRSpeed(0);
-                botState = WAITING;
+                this->rearDrive->setWheelAngle(0);
+                allignState = WAITING;
                 tempState = APPROACHING;
                 this->allignPID->reset();
                 t = millis();
             }
+
             break;
     }
     return false;
@@ -306,10 +404,22 @@ bool Robot::ascendStep(){
 
     switch(botState){
         case IDLE:
-            botState = RAISINGFRONT;
-            Serial.println("CALIBRATING");
-            this->sensors->gyroCalibrate();
-            Serial.println("CALIBRATED");
+            botState = ALLIGNING;
+            break;
+
+        case ALLIGNING:
+            if(this->allignStep()){
+                botState = CLEANING;
+            }
+            break;
+        
+        case CLEANING:
+            if(this->cleanStep()){
+                Serial.println("CALIBRATING");
+                this->sensors->gyroCalibrate();
+                Serial.println("CALIBRATED");
+                botState = RAISINGFRONT;
+            }
             break;
 
         case RAISINGFRONT:
