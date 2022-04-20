@@ -84,7 +84,7 @@ bool Robot::home(){
 bool Robot::cleanStep(){
     static RobotState cleanState = IDLE;
     static RobotState tempState;
-    static int cleaningSpeed = HALF_SPEED;
+    static int cleaningSpeed = QUARTER_SPEED;
     static unsigned long t = 0;
     
 
@@ -98,7 +98,7 @@ bool Robot::cleanStep(){
             break;
 
         case CLEANLEFT:
-            this->stairFollow(cleaningSpeed, DIST_TO_STEP);
+            this->stairFollow(cleaningSpeed * -1, DIST_TO_STEP);
             if(!digitalRead(BUMP_LEFT)){
                 t = millis();
                 this->pidSpeed(0);
@@ -108,7 +108,7 @@ bool Robot::cleanStep(){
             break;
 
         case CLEANRIGHT:
-            this->stairFollow((cleaningSpeed * -1), DIST_TO_STEP);
+            this->stairFollow((cleaningSpeed), DIST_TO_STEP);
             if(!digitalRead(BUMP_RIGHT)){
                 t = millis();
                 this->pidSpeed(0);
@@ -118,7 +118,7 @@ bool Robot::cleanStep(){
             break;
 
         case DRIVING:
-            if(this->driveDist(50)){
+            if(this->driveTo(50)){
                 this->frontDrive->setWheelAngle(0);
                 this->rearDrive->setWheelAngle(0);
                 cleanState = IDLE;
@@ -253,7 +253,7 @@ bool Robot::allignStep(){
             }
 
             //First Pass and one of the sensors is at correct distance
-            else if(firstPass == true && (this->sensors->sensor_ranges[0] == DIST_TO_STEP || this->sensors->sensor_ranges[1] == DIST_TO_STEP)){
+            else if(firstPass == true && (this->sensors->sensor_ranges[0] <= DIST_TO_STEP+10 || this->sensors->sensor_ranges[1] <= DIST_TO_STEP+10)){
                 this->pidSpeed(0);
                 firstPass = false;
                 allignState = WAITING;
@@ -342,6 +342,7 @@ bool Robot::driveUpTo(float mm){
     sensors->getRangeData(magnitude, difference);
     if(magnitude == DIST_TO_STEP){
         this->pidSpeed(0);
+        this->allignPID->reset();
         resetFlag = true;
         return true;
     }
@@ -399,26 +400,35 @@ bool Robot::driveTo(float mm){
 bool Robot::ascendStep(){
     static RobotState tempState;
     static RobotState driveState;
+    static RobotState allignState;
     static int dist;
     static unsigned long t = 0;
 
     switch(botState){
         case IDLE:
             botState = ALLIGNING;
+            allignState = RAISINGFRONT;
             break;
 
         case ALLIGNING:
             if(this->allignStep()){
-                botState = CLEANING;
+                tempState = allignState;
+                if(tempState == CLEANING){
+                    this->rearDrive->pidRSpeed(90);
+                    this->rearDrive->setWheelAngle(90);
+                }
+                botState = WAITING;
+                Serial.println("CALIBRATING");
+                this->sensors->gyroCalibrate();
+                Serial.println("CALIBRATED");
+                t = millis();
             }
             break;
         
         case CLEANING:
             if(this->cleanStep()){
-                Serial.println("CALIBRATING");
-                this->sensors->gyroCalibrate();
-                Serial.println("CALIBRATED");
-                botState = RAISINGFRONT;
+                botState = IDLE;
+                return true;
             }
             break;
 
@@ -483,7 +493,7 @@ bool Robot::ascendStep(){
                 tempState = DRIVING;
                 driveState = RAISINGREAR;
                 t = millis();
-                dist = 125;
+                dist = 135;
             }
             break;
 
@@ -491,7 +501,8 @@ bool Robot::ascendStep(){
             if(this->scissors->rState == Scissors::OPEN){
                 tempState = DRIVEUPTO;
                 botState = WAITING;
-                driveState = IDLE;
+                driveState = ALLIGNING;
+                allignState = CLEANING;
                 t = millis();
             }
             else{
