@@ -29,7 +29,10 @@ void loop(){
   switch(testState){
     case 0:
       if(bot.ascendStep()){testState = 1;}
-      //if(bot.allignStep()){testState = 1;}
+      // if(bot.scissors->stepRearDown()){
+      //     bot.scissors->rearSpeed(0);
+      //     testState = 1;
+      // }
       break;
 
     case 1:

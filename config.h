@@ -86,7 +86,7 @@ static const int LOX2_SHT = 33;
 static const int TOF_SENSOR_COUNT = 2;
 static const int TOF_PERIOD = 10;
 
-static const float ANGLE_OFFSET = -2.0;
+static const float ANGLE_OFFSET = -3.0;
 static const float LEVEL_ANGLE = -2.0;
 static const float GYRO_WEIGHT = 0.95;
 static const float ACCEL_WEIGHT = 0.05;

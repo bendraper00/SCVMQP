@@ -72,6 +72,8 @@ void Robot::stairFollow(int16_t speed, uint8_t dist){
 bool Robot::home(){
     Serial.println(this->scissors->rState);
     if(!digitalRead(FRONT_OPEN_ENDSTOP) && !digitalRead(REAR_OPEN_ENDSTOP)){
+        this->scissors->lowerFront(0);
+        this->scissors->raiseRear(0);
         return true;
     }
     else{
@@ -414,7 +416,7 @@ bool Robot::ascendStep(){
             if(this->allignStep()){
                 tempState = allignState;
                 if(tempState == CLEANING){
-                    this->rearDrive->pidRSpeed(90);
+                    this->frontDrive->setWheelAngle(90);
                     this->rearDrive->setWheelAngle(90);
                 }
                 botState = WAITING;
@@ -493,12 +495,13 @@ bool Robot::ascendStep(){
                 tempState = DRIVING;
                 driveState = RAISINGREAR;
                 t = millis();
-                dist = 135;
+                dist = 125;
             }
             break;
 
         case RAISINGREAR:
             if(this->scissors->rState == Scissors::OPEN){
+                this->scissors->rearSpeed(0);
                 tempState = DRIVEUPTO;
                 botState = WAITING;
                 driveState = ALLIGNING;
